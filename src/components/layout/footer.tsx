@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Phone, Mail, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Lock } from "lucide-react";
 
 export function Footer() {
   return (
@@ -26,6 +26,11 @@ export function Footer() {
               <li><Link href="/products" className="hover:text-accent">Our Products</Link></li>
               <li><Link href="/about" className="hover:text-accent">About Us</Link></li>
               <li><Link href="/contact" className="hover:text-accent">Contact Us</Link></li>
+              <li className="pt-2">
+                <Link href="/admin" className="flex items-center text-accent hover:underline font-bold">
+                  <Lock className="h-3 w-3 mr-1" /> Admin Login
+                </Link>
+              </li>
             </ul>
           </div>
 

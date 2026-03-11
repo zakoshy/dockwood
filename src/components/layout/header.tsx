@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X, Phone, ShoppingBag } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
@@ -35,9 +35,6 @@ export function Header() {
               {link.name}
             </Link>
           ))}
-          <Button asChild variant="default" size="sm" className="bg-primary hover:bg-primary/90">
-            <Link href="/admin">Admin Login</Link>
-          </Button>
         </nav>
 
         {/* Mobile Nav Toggle */}
@@ -61,9 +58,6 @@ export function Header() {
               {link.name}
             </Link>
           ))}
-          <Button asChild className="w-full bg-primary" onClick={() => setIsOpen(false)}>
-            <Link href="/admin">Admin Login</Link>
-          </Button>
         </div>
       )}
     </header>
