@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -57,7 +56,7 @@ export default function AddProductPage() {
       toast({
         variant: "destructive",
         title: "AI Generation Failed",
-        description: error.message || "Ensure your API key is configured correctly in the .env file.",
+        description: error.message || "Please ensure your GOOGLE_GENAI_API_KEY is configured correctly in the .env file.",
       });
     } finally {
       setIsGenerating(false);

@@ -102,7 +102,7 @@ const generateProductContentFlow = ai.defineFlow(
   async (input) => {
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('Failed to generate product content.');
+      throw new Error('Failed to generate product content. Please check your API key.');
     }
     return output;
   }
