@@ -6,4 +6,5 @@ dockwood is a leading timber sales companny in mombasa
  UI: Next.js , Typescript , Tailwind
 
  to start the server simply type npm start in the terminal.
- 
+
+ make sure to modify the project to suit your needs and expectations.
