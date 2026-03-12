@@ -1,5 +1,9 @@
-# Firebase Studio
+dockwood is a leading timber sales companny in mombasa
+ use the npm install to install the dependancies in the package.json
 
-This is a NextJS starter in Firebase Studio.
+ stack used are :
+ AI : genkit
+ UI: Next.js , Typescript , Tailwind
 
-To get started, take a look at src/app/page.tsx.
+ to start the server simply type npm start in the terminal.
+ 
