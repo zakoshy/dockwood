@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Package, ShoppingCart, TrendingUp, AlertTriangle, Plus, List, Truck, Clock } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function AdminDashboard() {
   const stats = [
