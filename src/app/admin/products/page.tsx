@@ -1,6 +1,6 @@
-
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,6 +9,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const MOCK_PRODUCTS = [
   { id: "1", name: "Premium Mahogany King Bed", category: "Beds", quantity: 12, imageUrl: "https://picsum.photos/seed/bed1/100/100" },
@@ -19,6 +30,28 @@ const MOCK_PRODUCTS = [
 ];
 
 export default function AdminProducts() {
+  const { toast } = useToast();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleEdit = (name: string) => {
+    toast({
+      title: "Edit Mode",
+      description: `Opening editor for ${name}. In this MVP, this will open the product form with pre-filled data.`,
+    });
+  };
+
+  const confirmDelete = () => {
+    const product = MOCK_PRODUCTS.find(p => p.id === deleteId);
+    toast({
+      variant: "destructive",
+      title: "Product Removed",
+      description: `${product?.name} has been successfully deleted from the catalog.`,
+    });
+    setIsDeleteDialogOpen(false);
+    setDeleteId(null);
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -88,10 +121,23 @@ export default function AdminProducts() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-500 hover:text-accent hover:bg-accent/5">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-10 w-10 rounded-xl text-slate-500 hover:text-accent hover:bg-accent/5"
+                          onClick={() => handleEdit(product.name)}
+                        >
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            setDeleteId(product.id);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -103,6 +149,26 @@ export default function AdminProducts() {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-headline font-bold text-primary text-xl">Confirm Deletion</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground text-sm">
+              Are you sure you want to remove this product from the catalog? This action will hide the listing from the public showroom and cannot be undone in the live database.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="rounded-xl border-slate-200">Keep Product</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold"
+            >
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
