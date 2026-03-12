@@ -8,6 +8,7 @@ import { Search, Plus, Edit2, Trash2, ArrowUpDown, Filter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const MOCK_PRODUCTS = [
   { id: "1", name: "Premium Mahogany King Bed", category: "Beds", quantity: 12, imageUrl: "https://picsum.photos/seed/bed1/100/100" },
