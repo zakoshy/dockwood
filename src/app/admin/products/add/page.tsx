@@ -31,7 +31,7 @@ export default function AddProductPage() {
     if (!name || !category) {
       toast({
         title: "Details Required",
-        description: "Please enter a product name and category to help the AI generate content.",
+        description: "Please enter a product name and select a category to help the AI generate content.",
       });
       return;
     }
@@ -42,16 +42,22 @@ export default function AddProductPage() {
         productName: name,
         productCategory: category,
       });
-      setDescription(result.productDescription);
-      toast({
-        title: "Description Generated!",
-        description: "AI has suggested a professional description for your product.",
-      });
-    } catch (error) {
+      
+      if (result && result.productDescription) {
+        setDescription(result.productDescription);
+        toast({
+          title: "Description Generated!",
+          description: "AI has suggested a professional description for your product.",
+        });
+      } else {
+        throw new Error("No output received from AI.");
+      }
+    } catch (error: any) {
+      console.error("AI Generation Error:", error);
       toast({
         variant: "destructive",
         title: "AI Generation Failed",
-        description: "Could not connect to the AI service. Please try again.",
+        description: error.message || "Ensure your API key is configured correctly in the .env file.",
       });
     } finally {
       setIsGenerating(false);
@@ -100,7 +106,7 @@ export default function AddProductPage() {
                   id="name" 
                   placeholder="e.g. Premium Mahogany King Bed" 
                   required 
-                  className="h-11" 
+                  className="h-11 rounded-xl" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
@@ -109,7 +115,7 @@ export default function AddProductPage() {
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
                   <Select onValueChange={setCategory} required>
-                    <SelectTrigger className="h-11">
+                    <SelectTrigger className="h-11 rounded-xl">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -127,7 +133,7 @@ export default function AddProductPage() {
                     id="price" 
                     type="number" 
                     placeholder="45000" 
-                    className="h-11" 
+                    className="h-11 rounded-xl" 
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                   />
@@ -140,7 +146,7 @@ export default function AddProductPage() {
                     type="button" 
                     variant="outline" 
                     size="sm" 
-                    className="h-8 text-xs font-bold border-accent text-accent hover:bg-accent hover:text-white transition-all shadow-sm"
+                    className="h-8 text-xs font-bold border-accent text-accent hover:bg-accent hover:text-white transition-all shadow-sm rounded-lg"
                     onClick={handleAIGenerate}
                     disabled={isGenerating}
                   >
@@ -155,7 +161,7 @@ export default function AddProductPage() {
                 <Textarea 
                   id="description" 
                   placeholder="Describe features, wood type, dimensions..." 
-                  className="min-h-[180px] resize-none focus:ring-accent" 
+                  className="min-h-[180px] resize-none focus:ring-accent rounded-xl" 
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -176,34 +182,34 @@ export default function AddProductPage() {
                   type="number" 
                   placeholder="10" 
                   required 
-                  className="h-11" 
+                  className="h-11 rounded-xl" 
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sku">SKU / Reference ID</Label>
-                <Input id="sku" placeholder="DW-BED-001" className="h-11" />
+                <Input id="sku" placeholder="DW-BED-001" className="h-11 rounded-xl" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         <div className="lg:col-span-1 space-y-6">
-          <Card className="border-none shadow-sm">
+          <Card className="border-none shadow-sm overflow-hidden">
             <CardHeader>
               <CardTitle className="text-lg font-bold">Product Media</CardTitle>
               <CardDescription>Primary display image</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group">
+              <div className="aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer group">
                 <div className="bg-white p-3 rounded-full shadow-sm group-hover:scale-110 transition-transform">
                   <ImageIcon className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <span className="text-xs font-medium text-muted-foreground">Click to upload image</span>
               </div>
             </CardContent>
-            <CardFooter className="flex-col gap-2">
+            <CardFooter className="flex-col gap-2 bg-slate-50/50 p-4">
               <p className="text-[10px] text-muted-foreground text-center">
                 Supported formats: JPG, PNG. Max size 2MB.
               </p>
