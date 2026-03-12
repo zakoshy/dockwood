@@ -53,7 +53,7 @@ export function Footer() {
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 shrink-0 text-accent" />
-                <span>+254 700 000 000</span>
+                <span>+254 741 157 757</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 shrink-0 text-accent" />
