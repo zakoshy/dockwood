@@ -3,8 +3,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Plus, Edit2, Trash2, ArrowUpDown } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Search, Plus, Edit2, Trash2, ArrowUpDown, Filter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -19,67 +19,78 @@ const MOCK_PRODUCTS = [
 
 export default function AdminProducts() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Products</h1>
-          <p className="text-muted-foreground">Manage your catalog and stock levels.</p>
+          <h1 className="text-3xl font-headline font-bold text-primary">Catalog Management</h1>
+          <p className="text-muted-foreground">Manage your workshop inventory and listings.</p>
         </div>
-        <Button asChild className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20">
+        <Button asChild className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20 h-11 px-6 rounded-xl font-bold">
           <Link href="/admin/products/add">
-            <Plus className="mr-2 h-4 w-4" /> Add New Product
+            <Plus className="mr-2 h-5 w-5" /> Add New Product
           </Link>
         </Button>
       </div>
 
-      <Card className="border-none shadow-sm">
-        <CardHeader className="p-6">
+      <Card className="border-none shadow-sm overflow-hidden">
+        <CardHeader className="p-6 border-b bg-white">
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input placeholder="Search catalog..." className="pl-10 h-10 bg-slate-50 border-none" />
+              <Input placeholder="Search catalog..." className="pl-10 h-11 bg-slate-50 border-none rounded-xl" />
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm"><ArrowUpDown className="mr-2 h-4 w-4" /> Sort</Button>
-              <Button variant="outline" size="sm">Filter</Button>
+              <Button variant="outline" className="h-11 rounded-xl"><ArrowUpDown className="mr-2 h-4 w-4" /> Sort</Button>
+              <Button variant="outline" className="h-11 rounded-xl"><Filter className="mr-2 h-4 w-4" /> Filter</Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           <div className="relative overflow-x-auto">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs text-primary uppercase bg-slate-100">
+              <thead className="text-xs text-primary uppercase bg-slate-50/50">
                 <tr>
-                  <th className="px-6 py-4">Image</th>
-                  <th className="px-6 py-4">Product Name</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Stock</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-5">Image</th>
+                  <th className="px-6 py-5">Product Details</th>
+                  <th className="px-6 py-5">Category</th>
+                  <th className="px-6 py-5 text-center">Stock</th>
+                  <th className="px-6 py-5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {MOCK_PRODUCTS.map((product) => (
-                  <tr key={product.id} className="bg-white hover:bg-slate-50 transition-colors">
+                  <tr key={product.id} className="bg-white hover:bg-slate-50 transition-all group">
                     <td className="px-6 py-4">
-                      <div className="h-12 w-12 rounded-lg bg-slate-100 overflow-hidden relative border">
+                      <div className="h-14 w-14 rounded-xl bg-slate-100 overflow-hidden relative border shadow-sm group-hover:scale-105 transition-transform">
                         <Image src={product.imageUrl} alt={product.name} fill className="object-cover" />
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-bold text-primary">{product.name}</td>
                     <td className="px-6 py-4">
-                      <Badge variant="secondary" className="font-medium">{product.category}</Badge>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-primary group-hover:text-accent transition-colors">{product.name}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">ID: #{product.id.padStart(4, '0')}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`font-bold ${product.quantity < 5 ? 'text-red-600' : 'text-green-600'}`}>
-                        {product.quantity} units
-                      </span>
+                      <Badge variant="secondary" className="font-bold bg-slate-100 text-slate-700">{product.category}</Badge>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center">
+                        <span className={cn(
+                          "font-bold text-base",
+                          product.quantity < 5 ? 'text-red-600' : 'text-emerald-600'
+                        )}>
+                          {product.quantity}
+                        </span>
+                        <span className="text-[10px] uppercase font-bold text-muted-foreground">Units</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-accent">
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-500 hover:text-accent hover:bg-accent/5">
                           <Edit2 className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600">
+                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50">
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
