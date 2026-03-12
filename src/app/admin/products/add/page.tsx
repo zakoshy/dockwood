@@ -9,14 +9,54 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, Image as ImageIcon, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Image as ImageIcon, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { generateProductContent } from "@/ai/flows/generate-product-content-flow";
 
 export default function AddProductPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Form State
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+
+  const handleAIGenerate = async () => {
+    if (!name || !category) {
+      toast({
+        title: "Details Required",
+        description: "Please enter a product name and category to help the AI generate content.",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const result = await generateProductContent({
+        productName: name,
+        productCategory: category,
+      });
+      setDescription(result.productDescription);
+      toast({
+        title: "Description Generated!",
+        description: "AI has suggested a professional description for your product.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "AI Generation Failed",
+        description: "Could not connect to the AI service. Please try again.",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +67,7 @@ export default function AddProductPage() {
       setIsSubmitting(false);
       toast({
         title: "Product Created",
-        description: "The new item has been added to your catalog successfully.",
+        description: `${name} has been added to your catalog successfully.`,
       });
       router.push("/admin/products");
     }, 1500);
@@ -43,7 +83,7 @@ export default function AddProductPage() {
         </Button>
         <div>
           <h1 className="text-3xl font-headline font-bold text-primary">Add New Product</h1>
-          <p className="text-muted-foreground">Fill in the details to expand your catalog.</p>
+          <p className="text-muted-foreground">Expand your digital showroom catalog.</p>
         </div>
       </div>
 
@@ -56,36 +96,69 @@ export default function AddProductPage() {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Product Name</Label>
-                <Input id="name" placeholder="e.g. Premium Mahogany King Bed" required className="h-11" />
+                <Input 
+                  id="name" 
+                  placeholder="e.g. Premium Mahogany King Bed" 
+                  required 
+                  className="h-11" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select required>
+                  <Select onValueChange={setCategory} required>
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="beds">Beds</SelectItem>
-                      <SelectItem value="timber">Timber</SelectItem>
-                      <SelectItem value="chairs">Chairs</SelectItem>
-                      <SelectItem value="tables">Tables</SelectItem>
-                      <SelectItem value="cabinets">Cabinets</SelectItem>
+                      <SelectItem value="Beds">Beds</SelectItem>
+                      <SelectItem value="Timber">Timber</SelectItem>
+                      <SelectItem value="Chairs">Chairs</SelectItem>
+                      <SelectItem value="Tables">Tables</SelectItem>
+                      <SelectItem value="Cabinets">Cabinets</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="price">Estimated Price (KES)</Label>
-                  <Input id="price" type="number" placeholder="45000" className="h-11" />
+                  <Input 
+                    id="price" 
+                    type="number" 
+                    placeholder="45000" 
+                    className="h-11" 
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Product Description</Label>
+                <div className="flex justify-between items-center mb-1">
+                  <Label htmlFor="description">Product Description</Label>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 text-xs font-bold border-accent text-accent hover:bg-accent hover:text-white transition-all shadow-sm"
+                    onClick={handleAIGenerate}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                    )}
+                    AI Generate
+                  </Button>
+                </div>
                 <Textarea 
                   id="description" 
                   placeholder="Describe features, wood type, dimensions..." 
-                  className="min-h-[150px] resize-none" 
+                  className="min-h-[180px] resize-none focus:ring-accent" 
                   required
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
             </CardContent>
@@ -98,7 +171,15 @@ export default function AddProductPage() {
             <CardContent className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="stock">Available Stock Units</Label>
-                <Input id="stock" type="number" placeholder="10" required className="h-11" />
+                <Input 
+                  id="stock" 
+                  type="number" 
+                  placeholder="10" 
+                  required 
+                  className="h-11" 
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sku">SKU / Reference ID</Label>
@@ -152,7 +233,7 @@ export default function AddProductPage() {
               variant="outline" 
               className="w-full h-12 font-bold rounded-xl"
               onClick={() => router.back()}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isGenerating}
             >
               Cancel
             </Button>

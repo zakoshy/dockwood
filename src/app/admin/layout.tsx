@@ -15,8 +15,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -34,7 +33,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   const handleLogout = () => {
-    // In a real app, clear session/auth here
     router.push("/");
   };
 
@@ -105,7 +103,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64">
+            <SheetContent side="left" className="p-0 w-64 flex flex-col">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Admin Navigation</SheetTitle>
+              </SheetHeader>
               <SidebarContent />
             </SheetContent>
           </Sheet>
