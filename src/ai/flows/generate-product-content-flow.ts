@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {gemini15Flash} from '@genkit-ai/google-genai';
 
 const GenerateProductContentInputSchema = z.object({
   productName: z.string().describe('The name of the product.'),
@@ -76,6 +77,7 @@ export async function generateProductContent(
 
 const prompt = ai.definePrompt({
   name: 'generateProductContentPrompt',
+  model: gemini15Flash,
   input: {schema: GenerateProductContentInputSchema},
   output: {schema: GenerateProductContentOutputSchema},
   prompt: `You are an expert in SEO and e-commerce content generation for a timber and furniture company called {{companyName}}.
@@ -102,7 +104,7 @@ const generateProductContentFlow = ai.defineFlow(
   async (input) => {
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('Failed to generate product content. Please check your API key.');
+      throw new Error('Failed to generate product content. Please check your API key and network connection.');
     }
     return output;
   }
