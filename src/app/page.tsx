@@ -7,7 +7,7 @@ import { StructuredData } from "@/components/structured-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/products/product-card";
-import { Truck, ShieldCheck, Clock, Hammer, MapPin, PhoneCall } from "lucide-react";
+import { Truck, ShieldCheck, Clock, Hammer, MapPin, PhoneCall, Navigation } from "lucide-react";
 
 export default function Home() {
   const featuredProducts = [
@@ -22,6 +22,8 @@ export default function Home() {
     { icon: Clock, title: "Quick Service", description: "Prompt response to all inquiries and fast turnaround times." },
     { icon: Hammer, title: "Custom Orders", description: "We build furniture tailored to your specific space and needs." },
   ];
+
+  const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-4.0326,39.7027";
 
   return (
     <>
@@ -127,7 +129,7 @@ export default function Home() {
         {/* Location Section */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               <div>
                 <h2 className="text-3xl font-headline font-bold text-primary mb-6">Visit Our Showroom</h2>
                 <p className="text-muted-foreground mb-8 text-lg">
@@ -150,16 +152,23 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="h-[400px] w-full bg-muted rounded-2xl overflow-hidden border">
-                {/* Mock Map iframe - In production, use Google Maps API or real embed code */}
-                <iframe
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  style={{ border: 0 }}
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.880491845145!2d39.7027!3d-4.0326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNTcuNCJTIDM5wrA0MicyOS43IkU!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske"
-                  allowFullScreen
-                ></iframe>
+              <div className="flex flex-col gap-4 w-full">
+                <div className="h-[400px] w-full bg-muted rounded-2xl overflow-hidden border">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    style={{ border: 0 }}
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.880491845145!2d39.7027!3d-4.0326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNTcuNCJTIDM5wrA0MicyOS43IkU!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg" asChild>
+                  <a href={directionsUrl} target="_blank" rel="noopener noreferrer">
+                    <Navigation className="mr-2 h-5 w-5" />
+                    Get Directions to Shop
+                  </a>
+                </Button>
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Phone, Mail, MapPin, MessageCircle, Send } from "lucide-react";
+import { Phone, Mail, MapPin, MessageCircle, Send, Navigation } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ContactPage() {
@@ -19,6 +19,8 @@ export default function ContactPage() {
       description: "We'll get back to you as soon as possible!",
     });
   };
+
+  const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-4.0326,39.7027";
 
   return (
     <>
@@ -77,14 +79,22 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="h-[300px] bg-muted rounded-2xl overflow-hidden border">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.880491845145!2d39.7027!3d-4.0326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNTcuNCJTIDM5wrA0MicyOS43IkU!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske"
-                  allowFullScreen
-                ></iframe>
+              <div className="flex flex-col gap-4">
+                <div className="h-[300px] bg-muted rounded-2xl overflow-hidden border">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.880491845145!2d39.7027!3d-4.0326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNTcuNCJTIDM5wrA0MicyOS43IkU!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+                <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg" asChild>
+                  <a href={directionsUrl} target="_blank" rel="noopener noreferrer">
+                    <Navigation className="mr-2 h-5 w-5" />
+                    Get Directions
+                  </a>
+                </Button>
               </div>
             </div>
 
