@@ -8,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Loader2, AlertCircle, Eye, EyeOff, Mail } from "lucide-react";
+import { Lock, Loader2, AlertCircle, Eye, EyeOff, Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -83,7 +84,16 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4">
+      <div className="mb-6">
+        <Button variant="ghost" asChild className="text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Return to Main Site
+          </Link>
+        </Button>
+      </div>
+
       <Card className="w-full max-w-md border-none shadow-2xl">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
@@ -202,7 +212,7 @@ export default function AdminLoginPage() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center border-t p-6 bg-slate-50/50">
+        <CardFooter className="flex flex-col gap-4 justify-center border-t p-6 bg-slate-50/50">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Dockwood Furniture's. All rights reserved.
           </p>
