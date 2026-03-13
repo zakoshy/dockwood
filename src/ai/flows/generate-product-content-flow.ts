@@ -76,6 +76,7 @@ export async function generateProductContent(
 
 const prompt = ai.definePrompt({
   name: 'generateProductContentPrompt',
+  // Explicitly using the qualified model name
   model: 'googleai/gemini-1.5-flash',
   input: {schema: GenerateProductContentInputSchema},
   output: {schema: GenerateProductContentOutputSchema},
@@ -101,9 +102,10 @@ const generateProductContentFlow = ai.defineFlow(
     outputSchema: GenerateProductContentOutputSchema,
   },
   async (input) => {
+    // Calling the prompt with the input
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('Failed to generate product content. Please check your API key and network connection.');
+      throw new Error('Failed to generate product content. Please check your API key and project status in Google AI Studio.');
     }
     return output;
   }
