@@ -1,7 +1,6 @@
-
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
@@ -11,11 +10,15 @@ import {
   Truck, 
   LogOut, 
   ChevronRight,
-  Menu
+  Menu,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useUser } from "@/firebase";
+import { signOut } from "firebase/auth";
+import { useAuth } from "@/firebase";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -24,6 +27,16 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, loading } = useUser();
+  const auth = useAuth();
+
+  const isLoginPage = pathname === "/admin/login";
+
+  useEffect(() => {
+    if (!loading && !user && !isLoginPage) {
+      router.push("/admin/login");
+    }
+  }, [user, loading, router, isLoginPage]);
 
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -32,9 +45,28 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Deliveries", href: "/admin/deliveries", icon: Truck },
   ];
 
-  const handleLogout = () => {
-    router.push("/");
+  const handleLogout = async () => {
+    if (auth) {
+      await signOut(auth);
+      router.push("/admin/login");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="h-10 w-10 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user && !isLoginPage) {
+    return null;
+  }
+
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-primary text-primary-foreground">
@@ -71,6 +103,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </nav>
 
       <div className="p-4 border-t border-white/10">
+        <div className="mb-4 px-4 text-xs text-primary-foreground/50 truncate">
+          {user?.email}
+        </div>
         <Button 
           variant="ghost" 
           className="w-full justify-start text-primary-foreground/70 hover:text-white hover:bg-white/10"

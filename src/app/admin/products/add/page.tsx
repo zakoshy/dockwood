@@ -12,9 +12,12 @@ import { ArrowLeft, Save, Image as ImageIcon, Loader2, Sparkles } from "lucide-r
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { generateProductContent } from "@/ai/flows/generate-product-content-flow";
+import { useFirestore } from "@/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function AddProductPage() {
   const router = useRouter();
+  const db = useFirestore();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -56,26 +59,44 @@ export default function AddProductPage() {
       toast({
         variant: "destructive",
         title: "AI Generation Failed",
-        description: error.message || "Please check your GOOGLE_GENAI_API_KEY and model availability.",
+        description: error.message || "Ensure your API key is correctly configured.",
       });
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!db) return;
+
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await addDoc(collection(db, "products"), {
+        name,
+        category,
+        description,
+        price: Number(price),
+        stock: Number(stock),
+        imageUrl: `https://picsum.photos/seed/${Date.now()}/800/600`,
+        createdAt: serverTimestamp(),
+      });
+
       toast({
         title: "Product Created",
         description: `${name} has been added to your catalog successfully.`,
       });
       router.push("/admin/products");
-    }, 1500);
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not save product to database.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -127,13 +148,14 @@ export default function AddProductPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="price">Estimated Price (KES)</Label>
+                  <Label htmlFor="price">Price (KES)</Label>
                   <Input 
                     id="price" 
                     type="number" 
                     placeholder="45000" 
                     className="h-11 rounded-xl" 
                     value={price}
+                    required
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>

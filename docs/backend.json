@@ -1,0 +1,68 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A timber or furniture product in the catalog.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "stock": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "sku": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "category", "price", "stock"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "A recorded transaction of a product sale.",
+      "type": "object",
+      "properties": {
+        "customerName": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["mpesa", "cash", "bank"] },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerName", "productId", "quantity", "totalAmount"]
+    },
+    "Delivery": {
+      "title": "Delivery",
+      "description": "A logistics entry for tracking a delivery.",
+      "type": "object",
+      "properties": {
+        "customerName": { "type": "string" },
+        "phone": { "type": "string" },
+        "location": { "type": "string" },
+        "items": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Out for Delivery", "Delivered", "Cancelled"] },
+        "urgency": { "type": "string", "enum": ["Normal", "Medium", "High"] },
+        "cost": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerName", "location", "status"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of all products in the catalog."
+    },
+    "/sales/{saleId}": {
+      "schema": "Sale",
+      "description": "History of all sales transactions."
+    },
+    "/deliveries/{deliveryId}": {
+      "schema": "Delivery",
+      "description": "Tracking logs for all deliveries."
+    }
+  }
+}
