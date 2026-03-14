@@ -137,7 +137,7 @@ export default function Home() {
                 We understand urgency. Whether it's timber for your construction project or a new bed for your home, our same-day delivery service covers all of Mombasa Bombolulu.
               </p>
               <Button size="lg" className="bg-accent text-white hover:bg-accent/90 px-10 rounded-full font-bold" asChild>
-                <a href="tel:+254741157757">Call Us Now</a>
+                <a href="tel:+254711662626">Call Us Now</a>
               </Button>
             </div>
             <div className="md:w-1/2 relative h-[300px] w-full rounded-2xl overflow-hidden shadow-2xl">
@@ -173,7 +173,7 @@ export default function Home() {
                     <div className="bg-primary/5 p-3 rounded-lg"><PhoneCall className="text-accent" /></div>
                     <div>
                       <h4 className="font-bold">Contact Number</h4>
-                      <p className="text-muted-foreground">0741 157 757</p>
+                      <p className="text-muted-foreground">0711 662 626</p>
                     </div>
                   </div>
                 </div>

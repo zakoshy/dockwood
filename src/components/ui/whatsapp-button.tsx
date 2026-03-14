@@ -3,8 +3,8 @@
 import { Phone } from "lucide-react";
 
 export function WhatsAppButton() {
-  const intlNumber = "254741157757";
-  const displayMobile = "0741 157 757";
+  const intlNumber = "254711662626";
+  const displayMobile = "0711 662 626";
   const waMessage = encodeURIComponent("Hello Dockwood Furniture's, I'm interested in your furniture products.");
   const waUrl = `https://wa.me/${intlNumber}?text=${waMessage}`;
   const telUrl = `tel:+${intlNumber}`;

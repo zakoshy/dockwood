@@ -52,7 +52,7 @@ export default function ContactPage() {
                     <div className="bg-primary/5 p-3 rounded-xl"><Phone className="text-accent" /></div>
                     <div>
                       <h4 className="font-bold">Call Us</h4>
-                      <p className="text-muted-foreground">+254 741 157 757</p>
+                      <p className="text-muted-foreground">+254 711 662 626</p>
                     </div>
                   </div>
 
@@ -71,7 +71,7 @@ export default function ContactPage() {
                     className="w-full border-accent text-accent hover:bg-accent hover:text-white h-12 rounded-xl"
                     asChild
                   >
-                    <a href="https://wa.me/254741157757" target="_blank" rel="noopener">
+                    <a href="https://wa.me/254711662626" target="_blank" rel="noopener">
                       <MessageCircle className="mr-2 h-5 w-5" />
                       Chat on WhatsApp
                     </a>
@@ -80,9 +80,9 @@ export default function ContactPage() {
                     className="w-full bg-primary hover:bg-primary/90 text-white h-12 rounded-xl font-bold"
                     asChild
                   >
-                    <a href="tel:+254741157757">
+                    <a href="tel:+254711662626">
                       <Phone className="mr-2 h-5 w-5" />
-                      Call 0741 157 757
+                      Call 0711 662 626
                     </a>
                   </Button>
                 </div>

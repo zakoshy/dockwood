@@ -16,7 +16,7 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, category, quantity, imageUrl }: ProductCardProps) {
   const handleInquiry = () => {
-    const phoneNumber = "254741157757";
+    const phoneNumber = "254711662626";
     const message = encodeURIComponent(`Hello Dockwood Furniture's, I would like to inquire about the price of ${name}.`);
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };

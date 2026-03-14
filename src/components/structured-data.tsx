@@ -6,7 +6,7 @@ export function StructuredData() {
     "image": "https://dockwoodfurnitures.co.ke/logo.png",
     "@id": "https://dockwoodfurnitures.co.ke",
     "url": "https://dockwoodfurnitures.co.ke",
-    "telephone": "+254741157757",
+    "telephone": "+254711662626",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Bombolulu, Kisimani, Opposite Nivash Supermarket",
