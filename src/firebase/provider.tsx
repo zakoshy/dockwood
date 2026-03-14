@@ -5,6 +5,7 @@ import { type FirebaseApp } from 'firebase/app';
 import { type Auth } from 'firebase/auth';
 import { type Firestore } from 'firebase/firestore';
 import { initializeFirebase } from './index';
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 type FirebaseContextType = {
   app: FirebaseApp | null;
@@ -26,13 +27,13 @@ export function FirebaseProvider({ children }: { children: React.ReactNode }) {
   });
 
   useEffect(() => {
-    // Initialize Firebase only once on the client side
     const initialized = initializeFirebase();
     setServices(initialized);
   }, []);
 
   return (
     <FirebaseContext.Provider value={services}>
+      <FirebaseErrorListener />
       {children}
     </FirebaseContext.Provider>
   );

@@ -33,7 +33,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
-    // If not loading and no user, redirect to login unless already there
     if (!loading && !user && !isLoginPage) {
       router.replace("/admin/login");
     }
@@ -67,7 +66,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
         <Loader2 className="h-10 w-10 text-primary animate-spin" />
-        <p className="text-sm font-medium text-muted-foreground animate-pulse font-headline">Authenticating...</p>
+        <p className="text-sm font-medium text-muted-foreground animate-pulse font-headline">Checking Authorization...</p>
       </div>
     );
   }

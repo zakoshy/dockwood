@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { 
   type Query, 
   onSnapshot, 
-  query, 
   DocumentData 
 } from 'firebase/firestore';
+import { errorEmitter } from '../error-emitter';
+import { FirestorePermissionError } from '../errors';
 
 export function useCollection<T = DocumentData>(queryRef: Query<T> | null) {
   const [data, setData] = useState<T[]>([]);
@@ -29,9 +30,13 @@ export function useCollection<T = DocumentData>(queryRef: Query<T> | null) {
         setData(results);
         setLoading(false);
       },
-      (err) => {
-        console.error(err);
-        setError(err);
+      async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: (queryRef as any)._path?.relativeName || 'unknown_collection',
+          operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        setError(permissionError);
         setLoading(false);
       }
     );
