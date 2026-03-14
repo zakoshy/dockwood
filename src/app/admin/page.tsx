@@ -15,7 +15,8 @@ import {
   Clock, 
   Users,
   ArrowUpRight,
-  Loader2
+  Loader2,
+  BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -46,7 +47,7 @@ export default function AdminDashboard() {
   );
 
   const stats = useMemo(() => {
-    const revenue = sales?.reduce((acc, sale: any) => acc + (sale.totalAmount || 0), 0) || 0;
+    const revenue = sales?.reduce((acc, sale: any) => acc + (Number(sale.totalAmount) || 0), 0) || 0;
     const activeDeliveries = deliveries?.filter((d: any) => d.status !== 'Delivered' && d.status !== 'Cancelled').length || 0;
     const lowStockCount = products?.filter((p: any) => (p.stock || 0) < 5).length || 0;
     const todayDeliveries = deliveries?.filter((d: any) => {
@@ -56,10 +57,10 @@ export default function AdminDashboard() {
     }).length || 0;
 
     return [
-      { title: "Total Revenue", value: `KES ${revenue.toLocaleString()}`, icon: TrendingUp, trend: "+8.2%", positive: true, color: "text-emerald-600", bg: "bg-emerald-50" },
-      { title: "Active Orders", value: sales?.length.toString() || "0", icon: ShoppingCart, trend: "Live", positive: true, color: "text-blue-600", bg: "bg-blue-50" },
-      { title: "Deliveries Today", value: todayDeliveries.toString(), icon: Truck, trend: "Fast", positive: true, color: "text-orange-600", bg: "bg-orange-50" },
-      { title: "Low Stock Items", value: lowStockCount.toString(), icon: AlertTriangle, trend: "Alert", positive: false, color: "text-red-600", bg: "bg-red-50" },
+      { title: "Total Revenue", value: `KES ${revenue.toLocaleString()}`, icon: TrendingUp, trend: revenue > 0 ? "Active" : "None", positive: revenue > 0, color: "text-emerald-600", bg: "bg-emerald-50" },
+      { title: "Total Sales", value: sales?.length.toString() || "0", icon: ShoppingCart, trend: sales?.length > 0 ? "Live" : "No Data", positive: sales?.length > 0, color: "text-blue-600", bg: "bg-blue-50" },
+      { title: "Deliveries Today", value: todayDeliveries.toString(), icon: Truck, trend: todayDeliveries > 0 ? "Active" : "Quiet", positive: todayDeliveries > 0, color: "text-orange-600", bg: "bg-orange-50" },
+      { title: "Low Stock Items", value: lowStockCount.toString(), icon: AlertTriangle, trend: lowStockCount > 0 ? "Alert" : "Healthy", positive: lowStockCount === 0, color: lowStockCount > 0 ? "text-red-600" : "text-emerald-600", bg: lowStockCount > 0 ? "bg-red-50" : "bg-emerald-50" },
     ];
   }, [products, sales, deliveries]);
 
@@ -67,32 +68,39 @@ export default function AdminDashboard() {
     return products?.filter((p: any) => (p.stock || 0) < 5).slice(0, 3) || [];
   }, [products]);
 
-  const activeDeliveries = useMemo(() => {
+  const recentDeliveries = useMemo(() => {
     return deliveries?.slice(0, 3) || [];
   }, [deliveries]);
 
   const chartData = useMemo(() => {
-    // Basic grouping by day for the last 7 days could go here
-    // For now, let's use a default set or dynamic if enough data exists
-    return [
-      { name: "Mon", total: 4500 },
-      { name: "Tue", total: 5200 },
-      { name: "Wed", total: 4800 },
-      { name: "Thu", total: 6100 },
-      { name: "Fri", total: 5900 },
-      { name: "Sat", total: 8200 },
-      { name: "Sun", total: 7500 },
-    ];
-  }, []);
+    if (!sales || sales.length === 0) return [];
+
+    // Group sales by day of the week for the last few entries
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const grouped = sales.reduce((acc: any, sale: any) => {
+      const date = sale.timestamp?.toDate ? sale.timestamp.toDate() : new Date(sale.timestamp);
+      const dayName = days[date.getDay()];
+      acc[dayName] = (acc[dayName] || 0) + (Number(sale.totalAmount) || 0);
+      return acc;
+    }, {});
+
+    // Return chronological order starting from 7 days ago or just common days
+    return days.map(day => ({
+      name: day,
+      total: grouped[day] || 0
+    })).filter(d => d.total > 0 || sales.length > 5); // Only show populated chart if there's enough data
+  }, [sales]);
 
   if (productsLoading || salesLoading || deliveriesLoading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground font-medium">Crunching data...</p>
+        <p className="text-muted-foreground font-medium">Synchronizing with Cloud Firestore...</p>
       </div>
     );
   }
+
+  const hasData = sales.length > 0 || products.length > 0 || deliveries.length > 0;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -136,48 +144,62 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <Card className="border-none shadow-sm">
+          <Card className="border-none shadow-sm min-h-[400px] flex flex-col">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-lg font-bold text-primary">Revenue Trends</CardTitle>
-                  <CardDescription>Performance Overview</CardDescription>
+                  <CardDescription>Visual performance metrics</CardDescription>
                 </div>
-                <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm">
-                  <ArrowUpRight className="h-4 w-4" /> Real-time
-                </div>
+                {chartData.length > 0 && (
+                  <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm">
+                    <ArrowUpRight className="h-4 w-4" /> Real-time
+                  </div>
+                )}
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="h-[300px] w-full pt-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData}>
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="#888888" 
-                      fontSize={12} 
-                      tickLine={false} 
-                      axisLine={false} 
-                    />
-                    <YAxis 
-                      stroke="#888888" 
-                      fontSize={12} 
-                      tickLine={false} 
-                      axisLine={false} 
-                      tickFormatter={(value) => `KES ${value}`}
-                    />
-                    <Tooltip 
-                      cursor={{fill: '#f8fafc'}}
-                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                    />
-                    <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                      {chartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#e15d2a' : '#2d4b38'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+            <CardContent className="flex-1 flex flex-col justify-center">
+              {chartData.length > 0 ? (
+                <div className="h-[300px] w-full pt-4">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <XAxis 
+                        dataKey="name" 
+                        stroke="#888888" 
+                        fontSize={12} 
+                        tickLine={false} 
+                        axisLine={false} 
+                      />
+                      <YAxis 
+                        stroke="#888888" 
+                        fontSize={12} 
+                        tickLine={false} 
+                        axisLine={false} 
+                        tickFormatter={(value) => `KES ${value}`}
+                      />
+                      <Tooltip 
+                        cursor={{fill: '#f8fafc'}}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                      />
+                      <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                        {chartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#e15d2a' : '#2d4b38'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center text-center py-12 space-y-4 opacity-40">
+                  <div className="bg-slate-100 p-6 rounded-full">
+                    <BarChart3 className="h-12 w-12 text-slate-400" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-600">No Sales Data Available</p>
+                    <p className="text-sm text-slate-500 max-w-xs mx-auto">Once you record your first sale, the revenue trend chart will appear here.</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -190,7 +212,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y">
-                {activeDeliveries.length > 0 ? activeDeliveries.map((delivery: any, i) => (
+                {recentDeliveries.length > 0 ? recentDeliveries.map((delivery: any, i) => (
                   <div key={i} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
                     <div className="flex items-center space-x-4">
                       <div className="bg-slate-100 p-2.5 rounded-full">
@@ -214,7 +236,9 @@ export default function AdminDashboard() {
                     </Badge>
                   </div>
                 )) : (
-                  <div className="p-8 text-center text-muted-foreground text-sm">No delivery activity recorded yet.</div>
+                  <div className="p-12 text-center text-muted-foreground text-sm italic">
+                    Logistics log is empty. Dispatch your first trip from the deliveries tab.
+                  </div>
                 )}
               </div>
               <Button variant="ghost" className="w-full text-accent hover:bg-accent/5 rounded-none h-12 font-bold" asChild>
@@ -225,14 +249,21 @@ export default function AdminDashboard() {
         </div>
 
         <div className="lg:col-span-1 space-y-8">
-          <Card className="border-none shadow-sm bg-gradient-to-br from-red-50 to-white">
+          <Card className={cn(
+            "border-none shadow-sm",
+            lowStockItems.length > 0 ? "bg-gradient-to-br from-red-50 to-white" : "bg-white"
+          )}>
             <CardHeader className="flex flex-row items-center gap-2">
-              <div className="bg-red-100 p-2 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+              <div className={cn("p-2 rounded-lg", lowStockItems.length > 0 ? "bg-red-100" : "bg-emerald-100")}>
+                <AlertTriangle className={cn("h-5 w-5", lowStockItems.length > 0 ? "text-red-600" : "text-emerald-600")} />
               </div>
               <div>
-                <CardTitle className="text-lg font-bold text-red-900">Inventory Alerts</CardTitle>
-                <CardDescription className="text-red-700/70">Urgent restocking required</CardDescription>
+                <CardTitle className={cn("text-lg font-bold", lowStockItems.length > 0 ? "text-red-900" : "text-emerald-900")}>
+                  {lowStockItems.length > 0 ? "Inventory Alerts" : "Inventory Status"}
+                </CardTitle>
+                <CardDescription className={lowStockItems.length > 0 ? "text-red-700/70" : "text-emerald-700/70"}>
+                  {lowStockItems.length > 0 ? "Urgent restocking required" : "All stock levels healthy"}
+                </CardDescription>
               </div>
             </CardHeader>
             <CardContent>
@@ -248,7 +279,9 @@ export default function AdminDashboard() {
                     <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{item.category}</span>
                   </div>
                 )) : (
-                  <div className="text-sm text-muted-foreground py-4 text-center">All inventory levels are healthy.</div>
+                  <div className="text-sm text-muted-foreground py-8 text-center bg-slate-50 rounded-xl border border-dashed">
+                    No items found with low stock.
+                  </div>
                 )}
               </div>
               <Button className="w-full mt-6 bg-primary hover:bg-primary/90 h-11 font-bold rounded-xl" asChild>
