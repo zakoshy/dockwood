@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
@@ -7,14 +10,19 @@ import { StructuredData } from "@/components/structured-data";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/products/product-card";
-import { Truck, ShieldCheck, Clock, Hammer, MapPin, PhoneCall, Navigation } from "lucide-react";
+import { Truck, ShieldCheck, Clock, Hammer, MapPin, PhoneCall, Navigation, Loader2 } from "lucide-react";
+import { useCollection, useFirestore } from "@/firebase";
+import { collection, query, limit, orderBy } from "firebase/firestore";
 
 export default function Home() {
-  const featuredProducts = [
-    { id: "1", name: "Premium Mahogany King Bed", category: "Beds", quantity: 12, imageUrl: "https://picsum.photos/seed/bed1/800/600" },
-    { id: "2", name: "Solid Oak Dining Table", category: "Tables", quantity: 8, imageUrl: "https://picsum.photos/seed/table1/800/600" },
-    { id: "3", name: "High-Grade Cypress Timber", category: "Timber", quantity: 45, imageUrl: "https://picsum.photos/seed/timber1/800/600" },
-  ];
+  const db = useFirestore();
+
+  const featuredQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "products"), limit(3), orderBy("createdAt", "desc"));
+  }, [db]);
+
+  const { data: featuredProducts, loading } = useCollection(featuredQuery);
 
   const features = [
     { icon: Truck, title: "Same-Day Delivery", description: "Get your furniture delivered to your doorstep within hours in Mombasa." },
@@ -88,17 +96,35 @@ export default function Home() {
             <div className="flex justify-between items-end mb-12">
               <div>
                 <h2 className="text-3xl font-headline font-bold text-primary mb-2">Featured Products</h2>
-                <p className="text-muted-foreground">Check out our most popular timber and furniture items.</p>
+                <p className="text-muted-foreground">Check out our latest timber and furniture arrivals.</p>
               </div>
               <Button variant="link" asChild className="text-accent font-bold">
                 <Link href="/products">See All Items →</Link>
               </Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} {...product} />
-              ))}
-            </div>
+            
+            {loading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="h-10 w-10 animate-spin text-accent" />
+              </div>
+            ) : featuredProducts.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {featuredProducts.map((product: any) => (
+                  <ProductCard 
+                    key={product.id} 
+                    id={product.id}
+                    name={product.name}
+                    category={product.category}
+                    quantity={product.stock || 0}
+                    imageUrl={product.imageUrl}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-20 text-muted-foreground">
+                No featured products available at the moment.
+              </div>
+            )}
           </div>
         </section>
 

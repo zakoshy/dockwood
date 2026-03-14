@@ -1,37 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { WhatsAppButton } from "@/components/ui/whatsapp-button";
 import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useCollection, useFirestore } from "@/firebase";
+import { collection, query, orderBy } from "firebase/firestore";
 
 const CATEGORIES = ["All", "Beds", "Chairs", "Tables", "Timber", "Cabinets", "Other"];
 
-// Mock initial data - In production this comes from Firestore
-const INITIAL_PRODUCTS = [
-  { id: "1", name: "Premium Mahogany King Bed", category: "Beds", quantity: 12, imageUrl: "https://picsum.photos/seed/bed1/800/600" },
-  { id: "2", name: "Solid Oak Dining Table", category: "Tables", quantity: 8, imageUrl: "https://picsum.photos/seed/table1/800/600" },
-  { id: "3", name: "High-Grade Cypress Timber", category: "Timber", quantity: 45, imageUrl: "https://picsum.photos/seed/timber1/800/600" },
-  { id: "4", name: "Orthopedic Mattress Support Bed", category: "Beds", quantity: 5, imageUrl: "https://picsum.photos/seed/bed2/800/600" },
-  { id: "5", name: "Modern Office Swivel Chair", category: "Chairs", quantity: 2, imageUrl: "https://picsum.photos/seed/chair2/800/600" },
-  { id: "6", name: "Kitchen Pantry Cabinet", category: "Cabinets", quantity: 0, imageUrl: "https://picsum.photos/seed/cab1/800/600" },
-  { id: "7", name: "Treated Podo Timber Planks", category: "Timber", quantity: 100, imageUrl: "https://picsum.photos/seed/timber2/800/600" },
-  { id: "8", name: "6-Seater Hardwood Set", category: "Chairs", quantity: 15, imageUrl: "https://picsum.photos/seed/chair3/800/600" },
-];
-
 export default function ProductsPage() {
+  const db = useFirestore();
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredProducts = INITIAL_PRODUCTS.filter((product) => {
-    const matchesCategory = activeCategory === "All" || product.category === activeCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const productsQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "products"), orderBy("createdAt", "desc"));
+  }, [db]);
+
+  const { data: products, loading } = useCollection(productsQuery);
+
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    return products.filter((product: any) => {
+      const matchesCategory = activeCategory === "All" || product.category === activeCategory;
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [products, activeCategory, searchQuery]);
 
   return (
     <>
@@ -69,15 +70,27 @@ export default function ProductsPage() {
             ))}
           </div>
 
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <Loader2 className="h-10 w-10 animate-spin text-accent" />
+              <p className="font-bold text-primary">Loading Showroom...</p>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} {...product} />
+              {filteredProducts.map((product: any) => (
+                <ProductCard 
+                  key={product.id} 
+                  id={product.id}
+                  name={product.name}
+                  category={product.category}
+                  quantity={product.stock || 0}
+                  imageUrl={product.imageUrl}
+                />
               ))}
             </div>
           ) : (
             <div className="text-center py-20 bg-white rounded-2xl border border-dashed">
-              <p className="text-lg text-muted-foreground">No products found in this category matching your search.</p>
+              <p className="text-lg text-muted-foreground">No products found. Stay tuned for new stock!</p>
               <Button 
                 variant="link" 
                 onClick={() => { setActiveCategory("All"); setSearchQuery(""); }}
