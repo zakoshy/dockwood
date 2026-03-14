@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
     setError(null);
 
     try {
-      if (!auth) throw new Error("Firebase Auth not initialized");
+      if (!auth) throw new Error("Auth not initialized");
       await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: "Welcome Back",
