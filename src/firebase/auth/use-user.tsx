@@ -6,25 +6,27 @@ import { useAuth } from '../provider';
 
 export function useUser() {
   const auth = useAuth();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(auth?.currentUser || null);
+  const [loading, setLoading] = useState(!auth || auth.currentUser === undefined);
 
   useEffect(() => {
-    if (!auth) {
-      setLoading(false);
-      return;
-    }
-    
-    // Immediately check if there's a currentUser already
-    if (auth.currentUser) {
-      setUser(auth.currentUser);
-      setLoading(false);
-    }
+    if (!auth) return;
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
+    // Set initial user if already available
+    setUser(auth.currentUser);
+    setLoading(false);
+
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        setUser(user);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Auth state change error:", error);
+        setLoading(false);
+      }
+    );
     
     return () => unsubscribe();
   }, [auth]);

@@ -17,9 +17,8 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useUser } from "@/firebase";
+import { useUser, useAuth } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { useAuth } from "@/firebase";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -34,8 +33,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const isLoginPage = pathname === "/admin/login";
 
   useEffect(() => {
+    // If not loading and no user, redirect to login unless already there
     if (!loading && !user && !isLoginPage) {
-      router.push("/admin/login");
+      router.replace("/admin/login");
     }
   }, [user, loading, router, isLoginPage]);
 
@@ -48,26 +48,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const handleLogout = async () => {
     if (auth) {
-      await signOut(auth);
-      router.push("/admin/login");
+      try {
+        await signOut(auth);
+        router.push("/admin/login");
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
     }
   };
 
+  // Immediate return for login page to avoid flickering
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
+
+  // Show loading spinner while checking auth status
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
         <Loader2 className="h-10 w-10 text-primary animate-spin" />
-        <p className="text-sm font-medium text-muted-foreground animate-pulse">Initializing Portal...</p>
+        <p className="text-sm font-medium text-muted-foreground animate-pulse font-headline">Authenticating...</p>
       </div>
     );
   }
 
-  if (!user && !isLoginPage) {
+  // If not logged in after loading, don't render layout content (redirect handled by useEffect)
+  if (!user) {
     return null;
-  }
-
-  if (isLoginPage) {
-    return <>{children}</>;
   }
 
   const SidebarContent = () => (
@@ -132,14 +139,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 shadow-xl z-20">
         <SidebarContent />
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 lg:pl-64 flex flex-col">
-        {/* Mobile Header */}
         <header className="lg:hidden h-16 border-b bg-white flex items-center justify-between px-4 sticky top-0 z-30">
           <Link href="/admin" className="text-xl font-headline font-bold text-primary">
             Dockwood<span className="text-accent"> Admin</span>
@@ -159,7 +163,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </Sheet>
         </header>
 
-        <main className="p-4 md:p-8 lg:p-10 flex-grow">
+        <main className="p-4 md:p-8 lg:p-10 flex-grow animate-in fade-in duration-500">
           {children}
         </main>
       </div>
