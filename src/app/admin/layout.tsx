@@ -11,8 +11,7 @@ import {
   LogOut, 
   ChevronRight,
   Menu,
-  Loader2,
-  ExternalLink
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -108,16 +107,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </Link>
           );
         })}
-
-        <div className="pt-4 mt-4 border-t border-white/10">
-          <Link
-            href="/"
-            className="flex items-center px-4 py-3 rounded-lg text-sm font-medium text-primary-foreground/70 hover:text-white hover:bg-white/10 transition-all"
-          >
-            <ExternalLink className="mr-3 h-5 w-5 text-primary-foreground/50" />
-            View Public Site
-          </Link>
-        </div>
       </nav>
 
       <div className="p-4 border-t border-white/10">
