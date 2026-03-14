@@ -8,12 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, Image as ImageIcon, Loader2, Upload } from "lucide-react";
+import { ArrowLeft, Save, Image as ImageIcon, Loader2, Upload, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { generateProductContent } from "@/ai/flows/generate-product-content-flow";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function AddProductPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Form State
   const [name, setName] = useState("");
@@ -41,6 +43,38 @@ export default function AddProductPage() {
     if (file) {
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleAiGenerate = async () => {
+    if (!name || !category) {
+      toast({
+        variant: "destructive",
+        title: "Missing Info",
+        description: "Please enter a product name and select a category first.",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const result = await generateProductContent({
+        productName: name,
+        productCategory: category,
+      });
+      setDescription(result.productDescription);
+      toast({
+        title: "Description Generated",
+        description: "AI has drafted a professional description for you.",
+      });
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "AI Generation Failed",
+        description: "Could not connect to AI services. Please try again or type manually.",
+      });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -143,7 +177,7 @@ export default function AddProductPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select onValueChange={setCategory} required>
+                  <Select onValueChange={setCategory} required value={category}>
                     <SelectTrigger className="h-11 rounded-xl">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -170,7 +204,20 @@ export default function AddProductPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Product Description</Label>
+                <div className="flex justify-between items-end mb-2">
+                  <Label htmlFor="description">Product Description</Label>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 text-accent border-accent hover:bg-accent/5 gap-2 rounded-lg font-bold"
+                    onClick={handleAiGenerate}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                    Auto-Generate
+                  </Button>
+                </div>
                 <Textarea 
                   id="description" 
                   placeholder="Describe wood quality, durability, and key features..." 

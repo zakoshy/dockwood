@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Truck, Search, Filter, MapPin, Phone, User, Package, Banknote, Loader2, Plus } from "lucide-react";
+import { Truck, Search, Filter, MapPin, Phone, User, Package, Banknote, Loader2, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
   Dialog, 
@@ -16,11 +16,21 @@ import {
   DialogFooter,
   DialogDescription
 } from "@/components/ui/dialog";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useCollection, useFirestore } from "@/firebase";
-import { collection, addDoc, serverTimestamp, query, orderBy, doc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
 
 export default function AdminDeliveries() {
   const { toast } = useToast();
@@ -28,6 +38,8 @@ export default function AdminDeliveries() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Fetch Deliveries
   const { data: deliveries, loading } = useCollection(
@@ -99,6 +111,19 @@ export default function AdminDeliveries() {
       toast({ title: "Status Updated", description: `Delivery is now ${newStatus}.` });
     } catch (e: any) {
       toast({ variant: "destructive", title: "Error", description: "Failed to update status." });
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!db || !deleteId) return;
+    try {
+      await deleteDoc(doc(db, "deliveries", deleteId));
+      toast({ title: "Record Deleted", description: "The delivery entry has been removed." });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Error", description: "Failed to delete record." });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeleteId(null);
     }
   };
 
@@ -199,7 +224,7 @@ export default function AdminDeliveries() {
                   
                   <div className="flex-1 p-6 flex flex-col md:flex-row justify-between gap-6">
                     <div className="flex-1 space-y-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between">
                         <Badge 
                           variant="secondary" 
                           className={cn(
@@ -209,6 +234,17 @@ export default function AdminDeliveries() {
                         >
                           {delivery.urgency} Priority
                         </Badge>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-slate-300 hover:text-red-600 rounded-lg lg:opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => {
+                            setDeleteId(delivery.id);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -277,6 +313,26 @@ export default function AdminDeliveries() {
           ))
         )}
       </div>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-headline font-bold text-primary text-xl">Delete Logistics Record</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this delivery trip from the logs? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Keep Record</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold"
+            >
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
