@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo } from "react";
@@ -116,6 +117,7 @@ export default function Home() {
                     name={product.name}
                     category={product.category}
                     quantity={product.stock || 0}
+                    imageUrls={product.imageUrls}
                     imageUrl={product.imageUrl}
                   />
                 ))}

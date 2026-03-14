@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -84,6 +85,7 @@ export default function ProductsPage() {
                   name={product.name}
                   category={product.category}
                   quantity={product.stock || 0}
+                  imageUrls={product.imageUrls}
                   imageUrl={product.imageUrl}
                 />
               ))}
