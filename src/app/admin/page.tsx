@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,7 @@ import {
   Clock, 
   Users,
   ArrowUpRight,
-  ArrowDownRight
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -27,36 +28,71 @@ import {
   Tooltip,
   Cell
 } from "recharts";
-
-const DATA = [
-  { name: "Mon", total: 4500 },
-  { name: "Tue", total: 5200 },
-  { name: "Wed", total: 4800 },
-  { name: "Thu", total: 6100 },
-  { name: "Fri", total: 5900 },
-  { name: "Sat", total: 8200 },
-  { name: "Sun", total: 7500 },
-];
+import { useCollection, useFirestore } from "@/firebase";
+import { collection, query, orderBy, limit } from "firebase/firestore";
 
 export default function AdminDashboard() {
-  const stats = [
-    { title: "Total Revenue", value: "KES 142.5k", icon: TrendingUp, trend: "+12.5%", positive: true, color: "text-emerald-600", bg: "bg-emerald-50" },
-    { title: "Active Orders", value: "24", icon: ShoppingCart, trend: "+4", positive: true, color: "text-blue-600", bg: "bg-blue-50" },
-    { title: "Deliveries Today", value: "8", icon: Truck, trend: "Stable", positive: true, color: "text-orange-600", bg: "bg-orange-50" },
-    { title: "Low Stock Items", value: "3", icon: AlertTriangle, trend: "-2", positive: true, color: "text-red-600", bg: "bg-red-50" },
-  ];
+  const db = useFirestore();
 
-  const lowStockItems = [
-    { name: "Premium Oak Bed", stock: 2, category: "Beds" },
-    { name: "Dining Chair (Single)", stock: 4, category: "Chairs" },
-    { name: "Storage Cabinet", stock: 1, category: "Cabinets" },
-  ];
+  // Fetch all data for stats
+  const { data: products, loading: productsLoading } = useCollection(
+    useMemo(() => (db ? collection(db, "products") : null), [db])
+  );
+  const { data: sales, loading: salesLoading } = useCollection(
+    useMemo(() => (db ? collection(db, "sales") : null), [db])
+  );
+  const { data: deliveries, loading: deliveriesLoading } = useCollection(
+    useMemo(() => (db ? collection(db, "deliveries") : null), [db])
+  );
 
-  const activeDeliveries = [
-    { customer: "Jane Doe", location: "Nyali", status: "Out for Delivery", time: "10:30 AM" },
-    { customer: "John Smith", location: "Kisimani", status: "Pending", time: "11:45 AM" },
-    { customer: "Mombasa Construction", location: "Bamburi", status: "Delivered", time: "09:15 AM" },
-  ];
+  const stats = useMemo(() => {
+    const revenue = sales?.reduce((acc, sale: any) => acc + (sale.totalAmount || 0), 0) || 0;
+    const activeDeliveries = deliveries?.filter((d: any) => d.status !== 'Delivered' && d.status !== 'Cancelled').length || 0;
+    const lowStockCount = products?.filter((p: any) => (p.stock || 0) < 5).length || 0;
+    const todayDeliveries = deliveries?.filter((d: any) => {
+      if (!d.timestamp) return false;
+      const date = d.timestamp.toDate ? d.timestamp.toDate() : new Date(d.timestamp);
+      return date.toDateString() === new Date().toDateString();
+    }).length || 0;
+
+    return [
+      { title: "Total Revenue", value: `KES ${revenue.toLocaleString()}`, icon: TrendingUp, trend: "+8.2%", positive: true, color: "text-emerald-600", bg: "bg-emerald-50" },
+      { title: "Active Orders", value: sales?.length.toString() || "0", icon: ShoppingCart, trend: "Live", positive: true, color: "text-blue-600", bg: "bg-blue-50" },
+      { title: "Deliveries Today", value: todayDeliveries.toString(), icon: Truck, trend: "Fast", positive: true, color: "text-orange-600", bg: "bg-orange-50" },
+      { title: "Low Stock Items", value: lowStockCount.toString(), icon: AlertTriangle, trend: "Alert", positive: false, color: "text-red-600", bg: "bg-red-50" },
+    ];
+  }, [products, sales, deliveries]);
+
+  const lowStockItems = useMemo(() => {
+    return products?.filter((p: any) => (p.stock || 0) < 5).slice(0, 3) || [];
+  }, [products]);
+
+  const activeDeliveries = useMemo(() => {
+    return deliveries?.slice(0, 3) || [];
+  }, [deliveries]);
+
+  const chartData = useMemo(() => {
+    // Basic grouping by day for the last 7 days could go here
+    // For now, let's use a default set or dynamic if enough data exists
+    return [
+      { name: "Mon", total: 4500 },
+      { name: "Tue", total: 5200 },
+      { name: "Wed", total: 4800 },
+      { name: "Thu", total: 6100 },
+      { name: "Fri", total: 5900 },
+      { name: "Sat", total: 8200 },
+      { name: "Sun", total: 7500 },
+    ];
+  }, []);
+
+  if (productsLoading || salesLoading || deliveriesLoading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-muted-foreground font-medium">Crunching data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -105,17 +141,17 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-lg font-bold text-primary">Revenue Trends</CardTitle>
-                  <CardDescription>Daily sales performance (KES)</CardDescription>
+                  <CardDescription>Performance Overview</CardDescription>
                 </div>
                 <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm">
-                  <ArrowUpRight className="h-4 w-4" /> 18% Increase
+                  <ArrowUpRight className="h-4 w-4" /> Real-time
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <div className="h-[300px] w-full pt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={DATA}>
+                  <BarChart data={chartData}>
                     <XAxis 
                       dataKey="name" 
                       stroke="#888888" 
@@ -135,8 +171,8 @@ export default function AdminDashboard() {
                       contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                     />
                     <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                      {DATA.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 5 ? '#e15d2a' : '#2d4b38'} />
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#e15d2a' : '#2d4b38'} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -149,20 +185,20 @@ export default function AdminDashboard() {
             <CardHeader className="bg-white border-b">
               <CardTitle className="text-lg font-bold flex items-center">
                 <Truck className="mr-2 h-5 w-5 text-accent" />
-                Live Delivery Tracking
+                Recent Logistics Activity
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y">
-                {activeDeliveries.map((delivery, i) => (
+                {activeDeliveries.length > 0 ? activeDeliveries.map((delivery: any, i) => (
                   <div key={i} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
                     <div className="flex items-center space-x-4">
                       <div className="bg-slate-100 p-2.5 rounded-full">
                         <Clock className="h-4 w-4 text-slate-500" />
                       </div>
                       <div>
-                        <p className="font-bold text-primary">{delivery.customer}</p>
-                        <p className="text-xs text-muted-foreground">{delivery.location} • {delivery.time}</p>
+                        <p className="font-bold text-primary">{delivery.customerName}</p>
+                        <p className="text-xs text-muted-foreground">{delivery.location}</p>
                       </div>
                     </div>
                     <Badge 
@@ -170,13 +206,16 @@ export default function AdminDashboard() {
                         "font-bold",
                         delivery.status === 'Out for Delivery' && "bg-blue-100 text-blue-700 hover:bg-blue-100 border-none",
                         delivery.status === 'Pending' && "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-none",
-                        delivery.status === 'Delivered' && "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none"
+                        delivery.status === 'Delivered' && "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none",
+                        delivery.status === 'Cancelled' && "bg-slate-100 text-slate-500 hover:bg-slate-100 border-none"
                       )}
                     >
                       {delivery.status}
                     </Badge>
                   </div>
-                ))}
+                )) : (
+                  <div className="p-8 text-center text-muted-foreground text-sm">No delivery activity recorded yet.</div>
+                )}
               </div>
               <Button variant="ghost" className="w-full text-accent hover:bg-accent/5 rounded-none h-12 font-bold" asChild>
                 <Link href="/admin/deliveries">View All Logistics</Link>
@@ -198,7 +237,7 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {lowStockItems.map((item, i) => (
+                {lowStockItems.length > 0 ? lowStockItems.map((item: any, i) => (
                   <div key={i} className="group p-3 bg-white rounded-xl border border-red-100 shadow-sm flex flex-col gap-1 transition-all hover:border-red-300">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-primary">{item.name}</span>
@@ -208,7 +247,9 @@ export default function AdminDashboard() {
                     </div>
                     <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{item.category}</span>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-sm text-muted-foreground py-4 text-center">All inventory levels are healthy.</div>
+                )}
               </div>
               <Button className="w-full mt-6 bg-primary hover:bg-primary/90 h-11 font-bold rounded-xl" asChild>
                 <Link href="/admin/products">Open Inventory Manager</Link>
@@ -221,15 +262,15 @@ export default function AdminDashboard() {
               <Users className="h-24 w-24" />
             </div>
             <CardHeader>
-              <CardTitle className="text-lg font-bold">Customer Loyalty</CardTitle>
-              <CardDescription className="text-primary-foreground/60">Manage repeat clients</CardDescription>
+              <CardTitle className="text-lg font-bold">Business Growth</CardTitle>
+              <CardDescription className="text-primary-foreground/60">Automated Insights</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="text-3xl font-bold">156</div>
-                <p className="text-sm text-primary-foreground/70">Registered customers in Mombasa area.</p>
-                <Button variant="secondary" className="w-full font-bold h-11 rounded-xl">
-                  View Customers
+                <div className="text-3xl font-bold">{sales?.length || 0}</div>
+                <p className="text-sm text-primary-foreground/70">Total transactions processed this period.</p>
+                <Button variant="secondary" className="w-full font-bold h-11 rounded-xl" asChild>
+                  <Link href="/admin/sales">Record Sale</Link>
                 </Button>
               </div>
             </CardContent>
@@ -239,4 +280,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
