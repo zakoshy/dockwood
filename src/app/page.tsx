@@ -59,10 +59,10 @@ export default function Home() {
               Trusted timber suppliers and expert furniture makers. Same-day delivery available in Bombolulu, Mombasa.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 font-bold text-lg rounded-full" asChild>
+              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 font-bold text-lg rounded-full shadow-lg shadow-accent/20" asChild>
                 <Link href="/products">View All Products</Link>
               </Button>
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary px-8 font-bold text-lg rounded-full" asChild>
+              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white hover:bg-white hover:text-primary px-8 font-bold text-lg rounded-full backdrop-blur-sm transition-all shadow-lg" asChild>
                 <Link href="/contact">Visit Our Shop</Link>
               </Button>
             </div>
