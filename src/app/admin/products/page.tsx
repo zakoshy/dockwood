@@ -45,13 +45,6 @@ export default function AdminProducts() {
     );
   }, [products, searchQuery]);
 
-  const handleEdit = (name: string) => {
-    toast({
-      title: "Edit Mode",
-      description: `Opening editor for ${name}. (Not implemented in MVP)`,
-    });
-  };
-
   const confirmDelete = async () => {
     if (!db || !deleteId) return;
     
@@ -132,7 +125,7 @@ export default function AdminProducts() {
                       <td className="px-6 py-4">
                         <div className="h-14 w-14 rounded-xl bg-slate-100 overflow-hidden relative border shadow-sm group-hover:scale-105 transition-transform">
                           <Image 
-                            src={product.imageUrl || "https://picsum.photos/seed/placeholder/100/100"} 
+                            src={(product.imageUrls && product.imageUrls[0]) || product.imageUrl || "https://picsum.photos/seed/placeholder/100/100"} 
                             alt={product.name} 
                             fill 
                             className="object-cover" 
@@ -165,9 +158,11 @@ export default function AdminProducts() {
                             variant="ghost" 
                             size="icon" 
                             className="h-10 w-10 rounded-xl text-slate-500 hover:text-accent hover:bg-accent/5"
-                            onClick={() => handleEdit(product.name)}
+                            asChild
                           >
-                            <Edit2 className="h-4 w-4" />
+                            <Link href={`/admin/products/edit/${product.id}`}>
+                              <Edit2 className="h-4 w-4" />
+                            </Link>
                           </Button>
                           <Button 
                             variant="ghost" 
