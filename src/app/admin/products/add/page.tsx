@@ -8,11 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, Image as ImageIcon, Loader2, Sparkles, Upload } from "lucide-react";
+import { ArrowLeft, Save, Image as ImageIcon, Loader2, Upload } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import { generateProductContent } from "@/ai/flows/generate-product-content-flow";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
@@ -23,7 +22,6 @@ export default function AddProductPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   // Form State
@@ -66,37 +64,6 @@ export default function AddProductPage() {
     if (!res.ok) throw new Error("Upload failed");
     const data = await res.json();
     return data.secure_url;
-  };
-
-  const handleAIGenerate = async () => {
-    if (!name || !category) {
-      toast({
-        title: "Details Required",
-        description: "Enter a name and category first.",
-      });
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
-      const result = await generateProductContent({
-        productName: name,
-        productCategory: category,
-      });
-      
-      if (result?.productDescription) {
-        setDescription(result.productDescription);
-        toast({ title: "Content Generated!" });
-      }
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "AI Generation Failed",
-        description: error.message,
-      });
-    } finally {
-      setIsGenerating(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -203,23 +170,10 @@ export default function AddProductPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="flex justify-between items-center mb-1">
-                  <Label htmlFor="description">SEO Description</Label>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
-                    className="h-8 text-xs font-bold border-accent text-accent hover:bg-accent hover:text-white transition-all rounded-lg"
-                    onClick={handleAIGenerate}
-                    disabled={isGenerating}
-                  >
-                    {isGenerating ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Sparkles className="mr-1.5 h-3.5 w-3.5" />}
-                    AI Generate
-                  </Button>
-                </div>
+                <Label htmlFor="description">Product Description</Label>
                 <Textarea 
                   id="description" 
-                  placeholder="Describe wood quality, durability..." 
+                  placeholder="Describe wood quality, durability, and key features..." 
                   className="min-h-[150px] resize-none rounded-xl" 
                   required
                   value={description}
