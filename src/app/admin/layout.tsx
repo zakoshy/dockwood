@@ -55,8 +55,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
         <Loader2 className="h-10 w-10 text-primary animate-spin" />
+        <p className="text-sm font-medium text-muted-foreground animate-pulse">Initializing Portal...</p>
       </div>
     );
   }

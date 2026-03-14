@@ -10,11 +10,22 @@ export function useUser() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth) return;
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+    
+    // Immediately check if there's a currentUser already
+    if (auth.currentUser) {
+      setUser(auth.currentUser);
+      setLoading(false);
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
     });
+    
     return () => unsubscribe();
   }, [auth]);
 

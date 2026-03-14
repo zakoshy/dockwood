@@ -12,13 +12,13 @@ let db: Firestore;
 export function initializeFirebase() {
   if (getApps().length === 0) {
     app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
   } else {
     app = getApps()[0];
-    auth = getAuth(app);
-    db = getFirestore(app);
   }
+  
+  auth = getAuth(app);
+  db = getFirestore(app);
+  
   return { app, auth, db };
 }
 
