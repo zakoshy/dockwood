@@ -1,7 +1,9 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { FirebaseProvider } from "@/firebase/provider";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Best Timber and Furniture in Mombasa | Dockwood Furnitures",
@@ -33,6 +35,7 @@ export default function RootLayout({
         <FirebaseProvider>
           {children}
           <Toaster />
+          <Analytics />
         </FirebaseProvider>
       </body>
     </html>
