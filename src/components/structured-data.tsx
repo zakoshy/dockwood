@@ -34,8 +34,8 @@ export function StructuredData() {
       "closes": "18:00"
     },
     "sameAs": [
-      "https://facebook.com/dockwoodfurnitures",
-      "https://instagram.com/dockwoodfurnitures"
+      "https://web.facebook.com/profile.php?id=61555310847954",
+      "https://www.instagram.com/dock_wood_kenya/"
     ]
   };
 

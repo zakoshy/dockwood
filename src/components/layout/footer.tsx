@@ -15,7 +15,7 @@ export function Footer() {
             </p>
             <div className="flex space-x-5">
               <Link 
-                href="https://web.facebook.com/search/top?q=dock%20wood%20furnitures" 
+                href="https://web.facebook.com/profile.php?id=61555310847954" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="hover:text-accent transition-colors"
