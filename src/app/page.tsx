@@ -63,7 +63,7 @@ export default function Home() {
               <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 font-bold text-lg rounded-full shadow-lg shadow-accent/20" asChild>
                 <Link href="/products">View All Products</Link>
               </Button>
-              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white hover:bg-white hover:text-primary px-8 font-bold text-lg rounded-full backdrop-blur-sm transition-all shadow-lg" asChild>
+              <Button size="lg" variant="outline" className="bg-white/20 text-white border-white hover:bg-white hover:text-primary px-8 font-bold text-lg rounded-full backdrop-blur-md transition-all shadow-xl" asChild>
                 <Link href="/contact">Visit Our Shop</Link>
               </Button>
             </div>
@@ -138,18 +138,22 @@ export default function Home() {
               <p className="text-lg text-primary-foreground/80 mb-8 max-w-lg">
                 We understand urgency. Whether it's timber for your construction project or a new bed for your home, our same-day delivery service covers all of Mombasa Bombolulu.
               </p>
-              <Button size="lg" className="bg-accent text-white hover:bg-accent/90 px-10 rounded-full font-bold" asChild>
+              <Button size="lg" className="bg-accent text-white hover:bg-accent/90 px-10 rounded-full font-bold shadow-xl shadow-accent/20" asChild>
                 <a href="tel:+254711662626">Call Us Now</a>
               </Button>
             </div>
-            <div className="md:w-1/2 relative h-[300px] w-full rounded-2xl overflow-hidden shadow-2xl">
+            <div className="md:w-1/2 relative h-[350px] w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10">
               <Image 
-                src="https://picsum.photos/seed/delivery/800/600" 
-                alt="Delivery Truck" 
+                src="https://picsum.photos/seed/delivery-van/800/600" 
+                alt="Delivery Vehicle" 
                 fill 
                 className="object-cover"
                 data-ai-hint="delivery truck"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+              <div className="absolute bottom-6 left-6">
+                <Badge className="bg-accent border-none text-white font-bold">Same-Day Service</Badge>
+              </div>
             </div>
           </div>
         </section>

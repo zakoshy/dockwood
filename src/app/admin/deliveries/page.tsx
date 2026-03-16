@@ -1,6 +1,8 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -208,7 +210,18 @@ export default function AdminDeliveries() {
         {loading ? (
           <div className="p-20 flex justify-center"><Loader2 className="h-10 w-10 animate-spin text-muted-foreground" /></div>
         ) : filteredDeliveries.length === 0 ? (
-          <div className="p-20 text-center text-muted-foreground bg-white rounded-2xl border border-dashed">No delivery trips recorded yet.</div>
+          <div className="p-20 text-center text-muted-foreground bg-white rounded-2xl border border-dashed flex flex-col items-center gap-6">
+            <div className="relative h-48 w-72 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+              <Image 
+                src="https://picsum.photos/seed/delivery-van/800/600" 
+                alt="Delivery Vehicle" 
+                fill 
+                className="object-contain"
+                data-ai-hint="delivery truck"
+              />
+            </div>
+            <p className="max-w-xs mx-auto">No delivery trips recorded yet. Use the dispatch button to start tracking your local furniture deliveries.</p>
+          </div>
         ) : (
           filteredDeliveries.map((delivery: any) => (
             <Card key={delivery.id} className="border-none shadow-sm overflow-hidden group hover:shadow-md transition-all">

@@ -29,6 +29,12 @@
       "description": "Stacks of high quality treated timber",
       "imageUrl": "https://picsum.photos/seed/timber1/800/600",
       "imageHint": "timber planks"
+    },
+    {
+      "id": "delivery-van",
+      "description": "Professional delivery vehicle for furniture transport",
+      "imageUrl": "https://picsum.photos/seed/delivery-van/800/600",
+      "imageHint": "delivery truck"
     }
   ]
 }
