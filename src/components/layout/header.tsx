@@ -20,7 +20,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-24 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-4">
-          <div className="relative h-16 w-16 overflow-hidden rounded-xl shadow-md border border-border/50 bg-white p-0.5">
+          <div className="relative h-16 w-16 overflow-hidden rounded-xl shadow-md border-2 border-primary/10 bg-white p-0.5">
             <div className="relative w-full h-full rounded-lg overflow-hidden">
               <Image 
                 src="/logo.jpeg" 
