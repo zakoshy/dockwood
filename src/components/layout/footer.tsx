@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Lock } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -7,7 +8,17 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="space-y-4">
-            <h3 className="text-2xl font-headline font-bold">Dockwood Furnitures</h3>
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="relative h-12 w-12 overflow-hidden rounded-xl border-2 border-white/10">
+                <Image 
+                  src="/logo.jpeg" 
+                  alt="Dockwood Logo" 
+                  fill 
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="text-2xl font-headline font-bold">Dockwood Furnitures</h3>
+            </div>
             <p className="text-sm text-primary-foreground/80 leading-relaxed">
               Premium timber and handcrafted furniture in Mombasa. 
               We pride ourselves on quality and same-day delivery.

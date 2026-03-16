@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +20,15 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-headline font-bold text-primary">
+          <div className="relative h-10 w-10 overflow-hidden rounded-lg">
+            <Image 
+              src="/logo.jpeg" 
+              alt="Dockwood Furnitures Logo" 
+              fill 
+              className="object-cover"
+            />
+          </div>
+          <span className="text-xl font-headline font-bold text-primary hidden sm:inline-block">
             Dockwood<span className="text-accent"> Furnitures</span>
           </span>
         </Link>

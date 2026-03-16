@@ -12,6 +12,7 @@ import { Lock, Loader2, AlertCircle, Eye, EyeOff, Mail, ArrowLeft } from "lucide
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -94,19 +95,24 @@ export default function AdminLoginPage() {
         </Button>
       </div>
 
-      <Card className="w-full max-w-md border-none shadow-2xl">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-primary/10 p-3 rounded-2xl">
-              <Lock className="h-10 w-10 text-primary" />
+      <Card className="w-full max-w-md border-none shadow-2xl overflow-hidden">
+        <CardHeader className="space-y-1 text-center bg-white pb-8">
+          <div className="flex justify-center mb-6">
+            <div className="relative h-24 w-24 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
+              <Image 
+                src="/logo.jpeg" 
+                alt="Dockwood Furnitures Logo" 
+                fill 
+                className="object-cover"
+              />
             </div>
           </div>
-          <CardTitle className="text-3xl font-headline font-bold">Admin Portal</CardTitle>
+          <CardTitle className="text-3xl font-headline font-bold text-primary">Admin Portal</CardTitle>
           <CardDescription>
             Secure access to Dockwood management tools.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-white">
           <form onSubmit={handleLogin} className="space-y-4">
             {error && (
               <Alert variant="destructive" className="rounded-xl border-none bg-red-50 text-red-900">
