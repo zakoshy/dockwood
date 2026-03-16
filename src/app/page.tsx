@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/layout/header";
@@ -13,9 +13,16 @@ import { ProductCard } from "@/components/products/product-card";
 import { Truck, ShieldCheck, Clock, Hammer, MapPin, PhoneCall, Navigation, Loader2 } from "lucide-react";
 import { useCollection, useFirestore } from "@/firebase";
 import { collection, query, limit, orderBy } from "firebase/firestore";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 export default function Home() {
   const db = useFirestore();
+  const [api, setApi] = useState<CarouselApi>();
 
   const featuredQuery = useMemo(() => {
     if (!db) return null;
@@ -23,6 +30,26 @@ export default function Home() {
   }, [db]);
 
   const { data: featuredProducts, loading } = useCollection(featuredQuery);
+
+  const heroImages = [
+    { src: "/table1.jpeg", alt: "Crafted Tables" },
+    { src: "/bed.jpg", alt: "Premium Beds" },
+    { src: "/chair.jpeg", alt: "Handmade Chairs" },
+    { src: "/seats.jpg", alt: "Comfortable Seating" },
+    { src: "/table.jpg", alt: "Solid Wood Tables" },
+    { src: "/bed3.jpeg", alt: "Luxury Bed Frames" },
+  ];
+
+  // Auto-slide effect
+  useEffect(() => {
+    if (!api) return;
+
+    const intervalId = setInterval(() => {
+      api.scrollNext();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [api]);
 
   const features = [
     { icon: Truck, title: "Same-Day Delivery", description: "Get your furniture delivered to your doorstep within hours in Mombasa." },
@@ -38,33 +65,46 @@ export default function Home() {
       <Header />
       <StructuredData />
       <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
-          <Image
-            src="https://picsum.photos/seed/dockwood-hero/1920/1080"
-            alt="Dockwood Furnitures Workshop"
-            fill
-            className="object-cover brightness-[0.4]"
-            priority
-            data-ai-hint="woodworking workshop"
-          />
-          <div className="container mx-auto px-4 relative z-10 text-center text-white">
-            <Badge className="mb-6 bg-accent border-none text-white px-4 py-1 text-sm uppercase tracking-wider font-bold">
-              Mombasa's Finest Timber & Furniture
-            </Badge>
-            <h1 className="text-4xl md:text-7xl font-headline font-bold mb-6 max-w-4xl mx-auto leading-tight">
-              Quality Woodwork That <span className="text-accent">Lasts a Lifetime</span>
-            </h1>
-            <p className="text-lg md:text-xl mb-10 text-white/90 max-w-2xl mx-auto">
-              Trusted timber suppliers and expert furniture makers. Same-day delivery available in Bombolulu, Mombasa.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 font-bold text-lg rounded-full shadow-lg shadow-accent/20" asChild>
-                <Link href="/products">View All Products</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="bg-white/20 text-white border-white hover:bg-white hover:text-primary px-8 font-bold text-lg rounded-full backdrop-blur-md transition-all shadow-xl" asChild>
-                <Link href="/contact">Visit Our Shop</Link>
-              </Button>
+        {/* Hero Section with Auto-Carousel */}
+        <section className="relative h-[85vh] overflow-hidden">
+          <Carousel setApi={setApi} className="w-full h-full" opts={{ loop: true }}>
+            <CarouselContent className="h-[85vh] ml-0">
+              {heroImages.map((image, index) => (
+                <CarouselItem key={index} className="pl-0 h-full relative">
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      className="object-cover brightness-[0.4]"
+                      priority={index === 0}
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+
+          {/* Hero Content Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="container mx-auto px-4 text-center text-white">
+              <Badge className="mb-6 bg-accent border-none text-white px-4 py-1 text-sm uppercase tracking-wider font-bold">
+                Mombasa's Finest Timber & Furniture
+              </Badge>
+              <h1 className="text-4xl md:text-7xl font-headline font-bold mb-6 max-w-4xl mx-auto leading-tight">
+                Quality Woodwork That <span className="text-accent">Lasts a Lifetime</span>
+              </h1>
+              <p className="text-lg md:text-xl mb-10 text-white/90 max-w-2xl mx-auto">
+                Trusted timber suppliers and expert furniture makers. Same-day delivery available in Bombolulu, Mombasa.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8 font-bold text-lg rounded-full shadow-lg shadow-accent/20" asChild>
+                  <Link href="/products">View All Products</Link>
+                </Button>
+                <Button size="lg" variant="outline" className="bg-white/20 text-white border-white hover:bg-white hover:text-primary px-8 font-bold text-lg rounded-full backdrop-blur-md transition-all shadow-xl" asChild>
+                  <Link href="/contact">Visit Our Shop</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
