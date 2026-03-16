@@ -14,8 +14,22 @@ export function Footer() {
               Mombasa's leading suppliers of premium timber and bespoke handcrafted furniture. Built on quality and integrity since 2010.
             </p>
             <div className="flex space-x-5">
-              <Link href="#" className="hover:text-accent transition-colors"><Facebook className="h-5 w-5" /></Link>
-              <Link href="#" className="hover:text-accent transition-colors"><Instagram className="h-5 w-5" /></Link>
+              <Link 
+                href="https://web.facebook.com/search/top?q=dock%20wood%20furnitures" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-accent transition-colors"
+              >
+                <Facebook className="h-5 w-5" />
+              </Link>
+              <Link 
+                href="https://www.instagram.com/dock_wood_kenya/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-accent transition-colors"
+              >
+                <Instagram className="h-5 w-5" />
+              </Link>
               <Link href="#" className="hover:text-accent transition-colors"><Twitter className="h-5 w-5" /></Link>
             </div>
           </div>
