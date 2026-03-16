@@ -40,13 +40,13 @@ export default function Home() {
     { src: "/bed3.jpeg", alt: "Luxury Bed Frames" },
   ];
 
-  // Auto-slide effect
+  // Auto-slide effect - Adjusted to 10 seconds
   useEffect(() => {
     if (!api) return;
 
     const intervalId = setInterval(() => {
       api.scrollNext();
-    }, 5000);
+    }, 10000);
 
     return () => clearInterval(intervalId);
   }, [api]);
