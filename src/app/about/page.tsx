@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import Image from "next/image";
@@ -34,7 +35,7 @@ export default function AboutPage() {
                 <h2 className="text-4xl font-headline font-bold text-primary mb-6">Built on Quality & Integrity</h2>
                 <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
                   <p>
-                    Dockwood Furniture's started as a small timber yard in Bombolulu with a simple vision: to provide high-quality wood and furniture that stands the test of time. 
+                    Dockwood Furnitures started as a small timber yard in Bombolulu with a simple vision: to provide high-quality wood and furniture that stands the test of time. 
                     Today, we serve hundreds of clients across Mombasa, from individual homeowners to large construction firms.
                   </p>
                   <p>

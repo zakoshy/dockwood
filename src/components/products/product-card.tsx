@@ -28,7 +28,7 @@ export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl 
 
   const handleInquiry = () => {
     const phoneNumber = "254711662626";
-    const message = encodeURIComponent(`Hello Dockwood Furniture's, I would like to inquire about the price of ${name}.`);
+    const message = encodeURIComponent(`Hello Dockwood Furnitures, I would like to inquire about the price of ${name}.`);
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
 
