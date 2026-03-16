@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Lock } from "lucide-react";
-import Image from "next/image";
+import { Phone, Mail, MapPin, Facebook, Instagram, Twitter } from "lucide-react";
 
 export function Footer() {
   return (
@@ -8,17 +7,7 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-2 border-white/30 shadow-2xl bg-white p-1">
-                <div className="relative w-full h-full rounded-xl overflow-hidden">
-                  <Image 
-                    src="/logo.jpeg" 
-                    alt="Dockwood Furnitures Logo" 
-                    fill 
-                    className="object-cover"
-                  />
-                </div>
-              </div>
+            <div className="flex items-center space-x-2">
               <h3 className="text-2xl font-headline font-bold leading-tight">Dockwood <br /> Furnitures</h3>
             </div>
             <p className="text-sm text-primary-foreground/70 leading-relaxed max-w-xs">
@@ -38,11 +27,6 @@ export function Footer() {
               <li><Link href="/products" className="hover:text-accent transition-colors">Furniture Catalog</Link></li>
               <li><Link href="/about" className="hover:text-accent transition-colors">Our Story</Link></li>
               <li><Link href="/contact" className="hover:text-accent transition-colors">Get in Touch</Link></li>
-              <li className="pt-4">
-                <Link href="/admin" className="flex items-center text-accent hover:underline font-bold bg-white/5 py-2 px-3 rounded-lg w-fit">
-                  <Lock className="h-3.5 w-3.5 mr-2" /> Admin Portal
-                </Link>
-              </li>
             </ul>
           </div>
 
