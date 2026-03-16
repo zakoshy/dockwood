@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div className="space-y-4">
-            <h3 className="text-2xl font-headline font-bold">Dockwood Furniture's</h3>
+            <h3 className="text-2xl font-headline font-bold">Dockwood Furnitures</h3>
             <p className="text-sm text-primary-foreground/80 leading-relaxed">
               Premium timber and handcrafted furniture in Mombasa. 
               We pride ourselves on quality and same-day delivery.
@@ -64,7 +64,7 @@ export function Footer() {
         </div>
         
         <div className="border-t border-primary-foreground/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-primary-foreground/60">
-          <p>© {new Date().getFullYear()} Dockwood Furniture's. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Dockwood Furnitures. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link href="/privacy" className="hover:text-accent">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-accent">Terms of Service</Link>

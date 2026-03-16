@@ -20,7 +20,7 @@ export function Header() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <span className="text-2xl font-headline font-bold text-primary">
-            Dockwood<span className="text-accent">'s</span>
+            Dockwood<span className="text-accent"> Furnitures</span>
           </span>
         </Link>
 

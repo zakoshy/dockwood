@@ -4,14 +4,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { FirebaseProvider } from "@/firebase/provider";
 
 export const metadata: Metadata = {
-  title: "Best Timber and Furniture in Mombasa | Dockwood Furniture's",
-  description: "Dockwood Furniture's is a trusted timber and furniture supplier in Mombasa offering beds, chairs, tables and high-quality timber products with same-day delivery in Bombolulu and surrounding areas.",
+  title: "Best Timber and Furniture in Mombasa | Dockwood Furnitures",
+  description: "Dockwood Furnitures is a trusted timber and furniture supplier in Mombasa offering beds, chairs, tables and high-quality timber products with same-day delivery in Bombolulu and surrounding areas.",
   keywords: "timber suppliers in Mombasa, furniture shops in Mombasa, beds for sale in Mombasa, wood furniture Mombasa, timber Kenya, buy beds chairs tables Mombasa",
   openGraph: {
-    title: "Best Timber and Furniture in Mombasa | Dockwood Furniture's",
+    title: "Best Timber and Furniture in Mombasa | Dockwood Furnitures",
     description: "Quality timber and furniture with same-day delivery in Mombasa.",
     url: 'https://dockwoodfurnitures.co.ke',
-    siteName: "Dockwood Furniture's",
+    siteName: "Dockwood Furnitures",
     locale: 'en_KE',
     type: 'website',
   },

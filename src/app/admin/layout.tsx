@@ -80,7 +80,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="p-6">
         <Link href="/admin" className="flex items-center space-x-2">
           <span className="text-xl font-headline font-bold">
-            Dockwood<span className="text-accent"> Admin</span>
+            Dockwood<span className="text-accent"> Furnitures</span>
           </span>
         </Link>
       </div>
@@ -134,7 +134,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="flex-1 lg:pl-64 flex flex-col">
         <header className="lg:hidden h-16 border-b bg-white flex items-center justify-between px-4 sticky top-0 z-30">
           <Link href="/admin" className="text-xl font-headline font-bold text-primary">
-            Dockwood<span className="text-accent"> Admin</span>
+            Dockwood<span className="text-accent"> Furnitures</span>
           </Link>
           <Sheet>
             <SheetTrigger asChild>

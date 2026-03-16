@@ -17,7 +17,7 @@ const GenerateProductContentInputSchema = z.object({
     .describe('The category of the product, e.g., "Beds", "Timber", "Chairs".'),
   companyName: z
     .string()
-    .default("Dockwood Furniture's")
+    .default("Dockwood Furnitures")
     .describe('The name of the company.'),
   companyAddress: z
     .string()

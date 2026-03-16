@@ -2,7 +2,7 @@ export function StructuredData() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "FurnitureStore",
-    "name": "Dockwood Furniture's",
+    "name": "Dockwood Furnitures",
     "image": "https://dockwoodfurnitures.co.ke/logo.png",
     "@id": "https://dockwoodfurnitures.co.ke",
     "url": "https://dockwoodfurnitures.co.ke",

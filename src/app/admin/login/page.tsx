@@ -214,7 +214,7 @@ export default function AdminLoginPage() {
         </CardContent>
         <CardFooter className="flex flex-col gap-4 justify-center border-t p-6 bg-slate-50/50">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Dockwood Furniture's. All rights reserved.
+            © {new Date().getFullYear()} Dockwood Furnitures. All rights reserved.
           </p>
         </CardFooter>
       </Card>

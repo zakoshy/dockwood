@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from "react";
@@ -43,7 +42,7 @@ export default function Home() {
         <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
           <Image
             src="https://picsum.photos/seed/dockwood-hero/1920/1080"
-            alt="Dockwood Furniture Workshop"
+            alt="Dockwood Furnitures Workshop"
             fill
             className="object-cover brightness-[0.4]"
             priority
