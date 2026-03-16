@@ -15,12 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useFirestore, useDoc } from "@/firebase";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 
-interface EditProductPageProps {
-  params: Promise<{ productId: string }>;
-}
-
-export default function EditProductPage({ params }: EditProductPageProps) {
-  const { productId } = use(params);
+export default function EditProductPage(props: { params: Promise<{ productId: string }> }) {
+  const resolvedParams = use(props.params);
+  const productId = resolvedParams.productId;
+  
   const router = useRouter();
   const db = useFirestore();
   const { toast } = useToast();
@@ -57,16 +55,6 @@ export default function EditProductPage({ params }: EditProductPageProps) {
       setExistingImages(product.imageUrls || []);
     }
   }, [product]);
-
-  // SKU Logic (consistent with Add page)
-  useEffect(() => {
-    if (!sku && (name || category)) {
-      const catPrefix = category ? category.substring(0, 3).toUpperCase() : "GEN";
-      const namePart = name ? name.substring(0, 3).replace(/\s+/g, '').toUpperCase() : "ITEM";
-      const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
-      setSku(`DW-${catPrefix}-${namePart}-${randomPart}`);
-    }
-  }, [name, category, sku]);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
