@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { useAuth } from "@/firebase";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Loader2, AlertCircle, Eye, EyeOff, Mail, ArrowLeft } from "lucide-react";
+import { Lock, Loader2, AlertCircle, Eye, EyeOff, Mail, ArrowLeft, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Link from "next/link";
@@ -29,6 +29,8 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [attempts, setAttempts] = useState(0);
+  const [lockoutTime, setLockoutTime] = useState(0);
   
   // Forgot Password States
   const [resetEmail, setResetEmail] = useState("");
@@ -39,22 +41,57 @@ export default function AdminLoginPage() {
   const auth = useAuth();
   const { toast } = useToast();
 
+  // Simple client-side rate limiting (cooldown after 5 failed attempts)
+  useEffect(() => {
+    if (lockoutTime > 0) {
+      const timer = setInterval(() => {
+        setLockoutTime((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    } else if (lockoutTime === 0 && attempts >= 5) {
+      setAttempts(0); // Reset after cooldown
+    }
+  }, [lockoutTime, attempts]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (lockoutTime > 0) {
+      toast({
+        variant: "destructive",
+        title: "Security Lockout",
+        description: `Too many failed attempts. Please wait ${lockoutTime} seconds.`,
+      });
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      if (!auth) throw new Error("Auth not initialized");
-      await signInWithEmailAndPassword(auth, email, password);
+      if (!auth) throw new Error("Authentication service is unavailable.");
+      
+      // Basic client-side sanitization
+      const cleanEmail = email.trim().toLowerCase();
+      
+      await signInWithEmailAndPassword(auth, cleanEmail, password);
+      
       toast({
-        title: "Welcome Back",
-        description: "Authenticated successfully. Redirecting to dashboard...",
+        title: "Access Granted",
+        description: "Secure session established. Redirecting...",
       });
       router.push("/admin");
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Invalid credentials. Please try again.");
+      console.error("Auth error:", err.code);
+      setAttempts((prev) => prev + 1);
+      
+      if (attempts >= 4) {
+        setLockoutTime(30); // 30-second cooldown
+        setError("Security alert: Too many failed login attempts. Account locked for 30 seconds.");
+      } else {
+        // Obfuscate specific error reasons for security (don't reveal if email vs password was wrong)
+        setError("Access Denied: Invalid credentials provided. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -66,18 +103,18 @@ export default function AdminLoginPage() {
 
     setResetLoading(true);
     try {
-      await sendPasswordResetEmail(auth, resetEmail);
+      await sendPasswordResetEmail(auth, resetEmail.trim().toLowerCase());
       toast({
-        title: "Reset Link Sent",
-        description: `A password reset link has been sent to ${resetEmail}.`,
+        title: "Recovery Link Sent",
+        description: `Instructions have been sent to ${resetEmail}.`,
       });
       setIsResetDialogOpen(false);
       setResetEmail("");
     } catch (err: any) {
       toast({
         variant: "destructive",
-        title: "Reset Failed",
-        description: err.message || "Could not send reset email.",
+        title: "Recovery Failed",
+        description: "Unable to process recovery request. Verify your email address.",
       });
     } finally {
       setResetLoading(false);
@@ -96,7 +133,10 @@ export default function AdminLoginPage() {
       </div>
 
       <Card className="w-full max-w-md border-none shadow-2xl overflow-hidden rounded-3xl">
-        <CardHeader className="space-y-2 text-center bg-white pb-8 pt-10">
+        <CardHeader className="space-y-2 text-center bg-white pb-8 pt-10 relative">
+          <div className="absolute top-4 right-4 text-emerald-600 opacity-20">
+            <ShieldCheck className="h-12 w-12" />
+          </div>
           <div className="flex justify-center mb-6">
             <div className="relative h-28 w-28 rounded-3xl overflow-hidden shadow-2xl border-4 border-white p-1 bg-white">
               <div className="relative w-full h-full rounded-2xl overflow-hidden">
@@ -111,15 +151,15 @@ export default function AdminLoginPage() {
           </div>
           <CardTitle className="text-3xl font-headline font-bold text-primary tracking-tight">Admin Portal</CardTitle>
           <CardDescription className="text-muted-foreground font-medium">
-            Secure management for Dockwood Furnitures.
+            Authorized Personnel Only
           </CardDescription>
         </CardHeader>
         <CardContent className="bg-white px-8">
           <form onSubmit={handleLogin} className="space-y-5">
             {error && (
-              <Alert variant="destructive" className="rounded-2xl border-none bg-red-50 text-red-900 shadow-sm">
+              <Alert variant="destructive" className="rounded-2xl border-none bg-red-50 text-red-900 shadow-sm animate-in fade-in slide-in-from-top-2">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle className="font-bold">Login Error</AlertTitle>
+                <AlertTitle className="font-bold">Security Notice</AlertTitle>
                 <AlertDescription className="text-xs">{error}</AlertDescription>
               </Alert>
             )}
@@ -130,6 +170,7 @@ export default function AdminLoginPage() {
                 type="email" 
                 placeholder="admin@dockwood.com" 
                 required 
+                disabled={lockoutTime > 0}
                 className="h-12 rounded-xl bg-slate-50 border-none shadow-inner focus-visible:ring-accent"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -141,7 +182,7 @@ export default function AdminLoginPage() {
                 <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="link" className="px-0 h-auto text-[10px] uppercase tracking-wider text-accent font-black hover:no-underline opacity-70 hover:opacity-100">
-                      Reset?
+                      Forgot?
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="rounded-3xl sm:max-w-md p-8 border-none shadow-2xl">
@@ -175,7 +216,7 @@ export default function AdminLoginPage() {
                           ) : (
                             <>
                               <Mail className="mr-2 h-4 w-4" />
-                              Send Link
+                              Send recovery Link
                             </>
                           )}
                         </Button>
@@ -189,6 +230,7 @@ export default function AdminLoginPage() {
                   id="password" 
                   type={showPassword ? "text" : "password"} 
                   required 
+                  disabled={lockoutTime > 0}
                   className="h-12 rounded-xl bg-slate-50 border-none shadow-inner pr-12 focus-visible:ring-accent"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -206,23 +248,25 @@ export default function AdminLoginPage() {
             </div>
             <Button 
               type="submit" 
-              className="w-full h-14 bg-primary hover:bg-primary/95 font-bold rounded-2xl text-lg shadow-xl mt-4 tracking-tight transition-all active:scale-95"
-              disabled={loading}
+              className="w-full h-14 bg-primary hover:bg-primary/95 font-bold rounded-2xl text-lg shadow-xl mt-4 tracking-tight transition-all active:scale-95 disabled:grayscale disabled:opacity-50"
+              disabled={loading || lockoutTime > 0}
             >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Authenticating...
+                  Verifying...
                 </>
+              ) : lockoutTime > 0 ? (
+                `Locked (${lockoutTime}s)`
               ) : (
-                "Sign In to Dashboard"
+                "Secure Sign In"
               )}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4 justify-center border-t border-slate-100 p-8 bg-slate-50/50 mt-8">
           <p className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/50">
-            © {new Date().getFullYear()} Dockwood Furnitures
+            © {new Date().getFullYear()} Dockwood Furnitures Security
           </p>
         </CardFooter>
       </Card>

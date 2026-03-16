@@ -1,23 +1,84 @@
 "use client";
 
+import { useState } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Phone, Mail, MapPin, MessageCircle, Send, Navigation } from "lucide-react";
+import { Phone, Mail, MapPin, MessageCircle, Send, Navigation, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ContactPage() {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+    honeypot: "", // Bot trap
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Message Sent",
-      description: "We'll get back to you as soon as possible!",
-    });
+    
+    // 1. Basic Sanitization & Validation
+    const sanitizedName = formData.name.trim();
+    const sanitizedEmail = formData.email.trim();
+    const sanitizedSubject = formData.subject.trim();
+    const sanitizedMessage = formData.message.trim();
+
+    if (formData.honeypot) {
+      // If the hidden field is filled, it's likely a bot
+      console.warn("Bot detected via honeypot.");
+      return;
+    }
+
+    if (!sanitizedName || !sanitizedEmail || !sanitizedMessage) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+      });
+      return;
+    }
+
+    // 2. Debouncing/Throttling via Loading State
+    setIsSubmitting(true);
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Message Sent Successfully",
+        description: "Thank you for reaching out! We will get back to you within 24 hours.",
+      });
+
+      // Reset Form
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+        honeypot: "",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "System Error",
+        description: "Could not send message at this time. Please try calling us directly.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-4.0326,39.7027";
@@ -111,27 +172,77 @@ export default function ContactPage() {
               <div className="bg-white p-10 rounded-2xl border shadow-sm">
                 <h2 className="text-2xl font-headline font-bold mb-8">Send a Message</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Honeypot Field - Hidden from users */}
+                  <div className="hidden" aria-hidden="true">
+                    <label htmlFor="honeypot">Leave this field empty</label>
+                    <input
+                      type="text"
+                      id="honeypot"
+                      value={formData.honeypot}
+                      onChange={handleChange}
+                      tabIndex={-1}
+                      autoComplete="off"
+                    />
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
-                      <Input id="name" placeholder="Your name" required className="h-12 bg-background/50" />
+                      <Input 
+                        id="name" 
+                        placeholder="Your name" 
+                        required 
+                        className="h-12 bg-background/50" 
+                        value={formData.name}
+                        onChange={handleChange}
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" placeholder="email@example.com" required className="h-12 bg-background/50" />
+                      <Input 
+                        id="email" 
+                        type="email" 
+                        placeholder="email@example.com" 
+                        required 
+                        className="h-12 bg-background/50" 
+                        value={formData.email}
+                        onChange={handleChange}
+                      />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="subject">Subject</Label>
-                    <Input id="subject" placeholder="What is your inquiry about?" required className="h-12 bg-background/50" />
+                    <Input 
+                      id="subject" 
+                      placeholder="What is your inquiry about?" 
+                      required 
+                      className="h-12 bg-background/50" 
+                      value={formData.subject}
+                      onChange={handleChange}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="message">Message</Label>
-                    <Textarea id="message" placeholder="Describe your request in detail..." className="min-h-[200px] bg-background/50" required />
+                    <Textarea 
+                      id="message" 
+                      placeholder="Describe your request in detail..." 
+                      className="min-h-[200px] bg-background/50" 
+                      required 
+                      value={formData.message}
+                      onChange={handleChange}
+                    />
                   </div>
-                  <Button type="submit" className="w-full md:w-auto px-10 h-12 bg-accent hover:bg-accent/90 text-white font-bold rounded-xl">
-                    <Send className="mr-2 h-4 w-4" />
-                    Send Message
+                  <Button 
+                    type="submit" 
+                    className="w-full md:w-auto px-10 h-12 bg-accent hover:bg-accent/90 text-white font-bold rounded-xl"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="mr-2 h-4 w-4" />
+                    )}
+                    {isSubmitting ? "Sending..." : "Send Message"}
                   </Button>
                 </form>
               </div>
