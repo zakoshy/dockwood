@@ -9,11 +9,11 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
-              <div className="relative h-16 w-16 overflow-hidden rounded-2xl border-2 border-white/20 shadow-xl bg-white/5 p-1">
+              <div className="relative h-20 w-20 overflow-hidden rounded-2xl border-2 border-white/30 shadow-2xl bg-white p-1">
                 <div className="relative w-full h-full rounded-xl overflow-hidden">
                   <Image 
                     src="/logo.jpeg" 
-                    alt="Dockwood Logo" 
+                    alt="Dockwood Furnitures Logo" 
                     fill 
                     className="object-cover"
                   />

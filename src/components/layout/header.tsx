@@ -18,18 +18,20 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-3">
-          <div className="relative h-14 w-14 overflow-hidden rounded-xl shadow-sm border border-border/50">
-            <Image 
-              src="/logo.jpeg" 
-              alt="Dockwood Furnitures Logo" 
-              fill 
-              className="object-cover"
-              priority
-            />
+      <div className="container mx-auto px-4 h-24 flex items-center justify-between">
+        <Link href="/" className="flex items-center space-x-4">
+          <div className="relative h-16 w-16 overflow-hidden rounded-xl shadow-md border border-border/50 bg-white p-0.5">
+            <div className="relative w-full h-full rounded-lg overflow-hidden">
+              <Image 
+                src="/logo.jpeg" 
+                alt="Dockwood Furnitures Logo" 
+                fill 
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
-          <span className="text-xl font-headline font-bold text-primary hidden sm:inline-block tracking-tight">
+          <span className="text-2xl font-headline font-bold text-primary hidden sm:inline-block tracking-tight">
             Dockwood<span className="text-accent"> Furnitures</span>
           </span>
         </Link>
