@@ -183,11 +183,11 @@ export default function Home() {
             </div>
             <div className="md:w-1/2 relative h-[350px] w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10">
               <Image 
-                src="https://picsum.photos/seed/delivery-van/800/600" 
-                alt="Delivery Vehicle" 
+                src="/seats.jpg" 
+                alt="Showroom Seating" 
                 fill 
                 className="object-cover"
-                data-ai-hint="delivery truck"
+                data-ai-hint="wooden seats"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
               <div className="absolute bottom-6 left-6">
