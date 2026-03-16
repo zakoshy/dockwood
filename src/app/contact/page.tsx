@@ -29,14 +29,12 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 1. Basic Sanitization & Validation
+    // Basic Sanitization
     const sanitizedName = formData.name.trim();
     const sanitizedEmail = formData.email.trim();
-    const sanitizedSubject = formData.subject.trim();
     const sanitizedMessage = formData.message.trim();
 
     if (formData.honeypot) {
-      // If the hidden field is filled, it's likely a bot
       console.warn("Bot detected via honeypot.");
       return;
     }
@@ -50,7 +48,6 @@ export default function ContactPage() {
       return;
     }
 
-    // 2. Debouncing/Throttling via Loading State
     setIsSubmitting(true);
 
     try {
@@ -81,7 +78,7 @@ export default function ContactPage() {
     }
   };
 
-  const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-4.0326,39.7027";
+  const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-4.029404,39.693963";
 
   return (
     <>
@@ -105,7 +102,7 @@ export default function ContactPage() {
                     <div className="bg-primary/5 p-3 rounded-xl"><MapPin className="text-accent" /></div>
                     <div>
                       <h4 className="font-bold">Visit Us</h4>
-                      <p className="text-muted-foreground">Bombolulu, Kisimani, Opposite Nivash Supermarket, Mombasa, Kenya</p>
+                      <p className="text-muted-foreground">Bombolulu, Kisimani, Opposite Nivash Supermarket, Opposite Petrocity, Mombasa</p>
                     </div>
                   </div>
 
@@ -155,7 +152,7 @@ export default function ContactPage() {
                     width="100%"
                     height="100%"
                     frameBorder="0"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.880491845145!2d39.7027!3d-4.0326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNTcuNCJTIDM5wrA0MicyOS43IkU!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.883713406283!2d39.693963!3d-4.029404!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNDUuOCJTIDM5wrA0MSczOC4zIkU!5e0!3m2!1sen!2ske!4v1710000000000!5m2!1sen!2ske"
                     allowFullScreen
                   ></iframe>
                 </div>
@@ -172,7 +169,7 @@ export default function ContactPage() {
               <div className="bg-white p-10 rounded-2xl border shadow-sm">
                 <h2 className="text-2xl font-headline font-bold mb-8">Send a Message</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Honeypot Field - Hidden from users */}
+                  {/* Honeypot Field */}
                   <div className="hidden" aria-hidden="true">
                     <label htmlFor="honeypot">Leave this field empty</label>
                     <input
@@ -188,23 +185,23 @@ export default function ContactPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
-                      <Input 
+                      <input 
                         id="name" 
                         placeholder="Your name" 
                         required 
-                        className="h-12 bg-background/50" 
+                        className="flex h-12 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
                         value={formData.name}
                         onChange={handleChange}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="email">Email Address</Label>
-                      <Input 
+                      <input 
                         id="email" 
                         type="email" 
                         placeholder="email@example.com" 
                         required 
-                        className="h-12 bg-background/50" 
+                        className="flex h-12 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
                         value={formData.email}
                         onChange={handleChange}
                       />
@@ -212,11 +209,11 @@ export default function ContactPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="subject">Subject</Label>
-                    <Input 
+                    <input 
                       id="subject" 
                       placeholder="What is your inquiry about?" 
                       required 
-                      className="h-12 bg-background/50" 
+                      className="flex h-12 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" 
                       value={formData.subject}
                       onChange={handleChange}
                     />

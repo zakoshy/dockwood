@@ -61,7 +61,7 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-primary-foreground/70">
               <li className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 shrink-0 text-accent" />
-                <span>Bombolulu, Kisimani, Opposite Nivash Supermarket, Mombasa, Kenya</span>
+                <span>Bombolulu, Kisimani, Opposite Nivash Supermarket, Opposite Petrocity, Mombasa</span>
               </li>
               <li className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 shrink-0 text-accent" />

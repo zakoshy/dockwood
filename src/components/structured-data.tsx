@@ -9,7 +9,7 @@ export function StructuredData() {
     "telephone": "+254711662626",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Bombolulu, Kisimani, Opposite Nivash Supermarket",
+      "streetAddress": "Bombolulu, Kisimani, Opposite Nivash Supermarket, Opposite Petrocity",
       "addressLocality": "Mombasa",
       "addressRegion": "Coast",
       "postalCode": "80100",
@@ -17,8 +17,8 @@ export function StructuredData() {
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": -4.0326,
-      "longitude": 39.7027
+      "latitude": -4.029404,
+      "longitude": 39.693963
     },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",

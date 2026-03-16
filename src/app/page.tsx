@@ -40,7 +40,7 @@ export default function Home() {
     { src: "/bed3.jpeg", alt: "Luxury Bed Frames" },
   ];
 
-  // Auto-slide effect - Adjusted to 10 seconds
+  // Auto-slide effect - 10 seconds per slide
   useEffect(() => {
     if (!api) return;
 
@@ -58,7 +58,7 @@ export default function Home() {
     { icon: Hammer, title: "Custom Orders", description: "We build furniture tailored to your specific space and needs." },
   ];
 
-  const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-4.0326,39.7027";
+  const directionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-4.029404,39.693963";
 
   return (
     <>
@@ -211,7 +211,7 @@ export default function Home() {
                     <div className="bg-primary/5 p-3 rounded-lg"><MapPin className="text-accent" /></div>
                     <div>
                       <h4 className="font-bold">Our Address</h4>
-                      <p className="text-muted-foreground">Bombolulu, Kisimani, Opposite Nivash Supermarket, Mombasa</p>
+                      <p className="text-muted-foreground">Bombolulu, Kisimani, Opposite Nivash Supermarket, Opposite Petrocity, Mombasa</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -230,7 +230,7 @@ export default function Home() {
                     height="100%"
                     frameBorder="0"
                     style={{ border: 0 }}
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.880491845145!2d39.7027!3d-4.0326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNTcuNCJTIDM5wrA0MicyOS43IkU!5e0!3m2!1sen!2ske!4v1620000000000!5m2!1sen!2ske"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3979.883713406283!2d39.693963!3d-4.029404!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwMDEnNDUuOCJTIDM5wrA0MSczOC4zIkU!5e0!3m2!1sen!2ske!4v1710000000000!5m2!1sen!2ske"
                     allowFullScreen
                   ></iframe>
                 </div>
