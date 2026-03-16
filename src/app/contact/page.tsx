@@ -31,7 +31,7 @@ export default function ContactPage() {
     
     // Basic Sanitization
     const sanitizedName = formData.name.trim();
-    const sanitizedEmail = formData.email.trim();
+    const sanitizedEmail = formData.email.trim().toLowerCase();
     const sanitizedMessage = formData.message.trim();
 
     if (formData.honeypot) {
@@ -118,7 +118,7 @@ export default function ContactPage() {
                     <div className="bg-primary/5 p-3 rounded-xl"><Mail className="text-accent" /></div>
                     <div>
                       <h4 className="font-bold">Email Us</h4>
-                      <p className="text-muted-foreground">info@dockwoodfurnitures.co.ke</p>
+                      <p className="text-muted-foreground">info@dockwoodfurnitures.com</p>
                     </div>
                   </div>
                 </div>

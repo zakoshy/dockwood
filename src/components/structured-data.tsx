@@ -3,9 +3,9 @@ export function StructuredData() {
     "@context": "https://schema.org",
     "@type": "FurnitureStore",
     "name": "Dockwood Furnitures",
-    "image": "https://dockwoodfurnitures.co.ke/logo.png",
-    "@id": "https://dockwoodfurnitures.co.ke",
-    "url": "https://dockwoodfurnitures.co.ke",
+    "image": "https://dockwoodfurnitures.com/logo.jpeg",
+    "@id": "https://dockwoodfurnitures.com",
+    "url": "https://dockwoodfurnitures.com",
     "telephone": "+254711662626",
     "address": {
       "@type": "PostalAddress",

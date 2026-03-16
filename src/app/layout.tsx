@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Best Timber and Furniture in Mombasa | Dockwood Furnitures",
     description: "Quality timber and furniture with same-day delivery in Mombasa.",
-    url: 'https://dockwoodfurnitures.co.ke',
+    url: 'https://dockwoodfurnitures.com',
     siteName: "Dockwood Furnitures",
     locale: 'en_KE',
     type: 'website',
