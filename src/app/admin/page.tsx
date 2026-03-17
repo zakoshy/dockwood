@@ -16,7 +16,10 @@ import {
   Users,
   ArrowUpRight,
   Loader2,
-  BarChart3
+  BarChart3,
+  Warehouse,
+  ChevronRight,
+  Layers
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -45,6 +48,9 @@ export default function AdminDashboard() {
   const { data: deliveries, loading: deliveriesLoading } = useCollection(
     useMemo(() => (db ? collection(db, "deliveries") : null), [db])
   );
+  const { data: warehouses, loading: warehousesLoading } = useCollection(
+    useMemo(() => (db ? collection(db, "warehouses") : null), [db])
+  );
 
   const stats = useMemo(() => {
     const revenue = sales?.reduce((acc, sale: any) => acc + (Number(sale.totalAmount) || 0), 0) || 0;
@@ -57,25 +63,71 @@ export default function AdminDashboard() {
     }).length || 0;
 
     return [
-      { title: "Total Revenue", value: `KES ${revenue.toLocaleString()}`, icon: TrendingUp, trend: revenue > 0 ? "Active" : "None", positive: revenue > 0, color: "text-emerald-600", bg: "bg-emerald-50" },
-      { title: "Total Sales", value: sales?.length.toString() || "0", icon: ShoppingCart, trend: sales?.length > 0 ? "Live" : "No Data", positive: sales?.length > 0, color: "text-blue-600", bg: "bg-blue-50" },
-      { title: "Deliveries Today", value: todayDeliveries.toString(), icon: Truck, trend: todayDeliveries > 0 ? "Active" : "Quiet", positive: todayDeliveries > 0, color: "text-orange-600", bg: "bg-orange-50" },
-      { title: "Low Stock Items", value: lowStockCount.toString(), icon: AlertTriangle, trend: lowStockCount > 0 ? "Alert" : "Healthy", positive: lowStockCount === 0, color: lowStockCount > 0 ? "text-red-600" : "text-emerald-600", bg: lowStockCount > 0 ? "bg-red-50" : "bg-emerald-50" },
+      { 
+        title: "Total Revenue", 
+        value: `KES ${revenue.toLocaleString()}`, 
+        icon: TrendingUp, 
+        trend: revenue > 0 ? "Active" : "None", 
+        positive: revenue > 0, 
+        color: "text-emerald-600", 
+        bg: "bg-emerald-50",
+        description: "Lifetime transaction value"
+      },
+      { 
+        title: "Active Deliveries", 
+        value: activeDeliveries.toString(), 
+        icon: Truck, 
+        trend: activeDeliveries > 0 ? "In Progress" : "All Clear", 
+        positive: activeDeliveries === 0, 
+        color: "text-blue-600", 
+        bg: "bg-blue-50",
+        description: "Current pending dispatches"
+      },
+      { 
+        title: "Total Stock Units", 
+        value: products?.reduce((acc, p: any) => acc + (Number(p.stock) || 0), 0).toString() || "0", 
+        icon: Layers, 
+        trend: "Live Inventory", 
+        positive: true, 
+        color: "text-purple-600", 
+        bg: "bg-purple-50",
+        description: "Items across all warehouses"
+      },
+      { 
+        title: "Critical Alerts", 
+        value: lowStockCount.toString(), 
+        icon: AlertTriangle, 
+        trend: lowStockCount > 0 ? "Requires Action" : "Optimal Levels", 
+        positive: lowStockCount === 0, 
+        color: lowStockCount > 0 ? "text-red-600" : "text-emerald-600", 
+        bg: lowStockCount > 0 ? "bg-red-50" : "bg-emerald-50",
+        description: "Items below 5 units"
+      },
     ];
   }, [products, sales, deliveries]);
 
-  const lowStockItems = useMemo(() => {
-    return products?.filter((p: any) => (p.stock || 0) < 5).slice(0, 3) || [];
-  }, [products]);
+  const warehouseStats = useMemo(() => {
+    if (!warehouses || !products) return [];
+    return warehouses.map((w: any) => {
+      const itemsInWarehouse = products.filter((p: any) => p.warehouseId === w.id);
+      const totalUnits = itemsInWarehouse.reduce((acc, p: any) => acc + (Number(p.stock) || 0), 0);
+      return {
+        id: w.id,
+        name: w.name,
+        count: itemsInWarehouse.length,
+        units: totalUnits,
+        color: "bg-primary"
+      };
+    }).sort((a, b) => b.units - a.units).slice(0, 4);
+  }, [warehouses, products]);
 
-  const recentDeliveries = useMemo(() => {
-    return deliveries?.slice(0, 3) || [];
-  }, [deliveries]);
+  const lowStockItems = useMemo(() => {
+    return products?.filter((p: any) => (p.stock || 0) < 5).slice(0, 4) || [];
+  }, [products]);
 
   const chartData = useMemo(() => {
     if (!sales || sales.length === 0) return [];
 
-    // Group sales by day of the week
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const grouped = sales.reduce((acc: any, sale: any) => {
       const date = sale.timestamp?.toDate ? sale.timestamp.toDate() : new Date(sale.timestamp);
@@ -87,29 +139,42 @@ export default function AdminDashboard() {
     return days.map(day => ({
       name: day,
       total: grouped[day] || 0
-    })).filter(d => d.total > 0 || sales.length > 5);
+    }));
   }, [sales]);
 
-  if (productsLoading || salesLoading || deliveriesLoading) {
+  if (productsLoading || salesLoading || deliveriesLoading || warehousesLoading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground font-medium">Synchronizing with Cloud Firestore...</p>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
+        <div className="relative">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-4 w-4 bg-accent rounded-full animate-ping" />
+          </div>
+        </div>
+        <div className="text-center space-y-2">
+          <p className="text-xl font-headline font-bold text-primary">Synchronizing Workspace</p>
+          <p className="text-muted-foreground animate-pulse">Fetching real-time inventory and logistics data...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary tracking-tight">Business Intelligence</h1>
-          <p className="text-muted-foreground">Real-time analytics of your workshop operations.</p>
+          <h1 className="text-4xl font-headline font-bold text-primary tracking-tight">Executive Dashboard</h1>
+          <p className="text-muted-foreground text-lg">Mombasa Operations Overview & Resource Management.</p>
         </div>
-        <div className="flex gap-3">
-          <Button asChild className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20 h-11 px-6 rounded-xl font-bold">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" asChild className="h-12 px-6 rounded-2xl font-bold border-2 hover:bg-slate-50 transition-all">
+            <Link href="/admin/warehouses">
+              <Warehouse className="mr-2 h-5 w-5 text-accent" /> Network Status
+            </Link>
+          </Button>
+          <Button asChild className="bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 h-12 px-8 rounded-2xl font-bold transition-all hover:scale-105 active:scale-95">
             <Link href="/admin/products/add">
-              <Plus className="mr-2 h-5 w-5" /> Add New Product
+              <Plus className="mr-2 h-5 w-5" /> New Stock Entry
             </Link>
           </Button>
         </div>
@@ -117,124 +182,138 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
-          <Card key={i} className="border-none shadow-sm hover:shadow-md transition-all duration-300">
-            <CardContent className="p-6">
+          <Card key={i} className="border-none shadow-sm hover:shadow-xl transition-all duration-500 bg-white group overflow-hidden">
+            <CardContent className="p-6 relative">
               <div className="flex items-center justify-between mb-4">
-                <div className={cn("p-2.5 rounded-xl", stat.bg)}>
+                <div className={cn("p-3 rounded-2xl transition-transform group-hover:scale-110 duration-500", stat.bg)}>
                   <stat.icon className={cn("h-6 w-6", stat.color)} />
                 </div>
                 <Badge variant="outline" className={cn(
-                  "font-bold text-[10px] px-2 py-0.5",
-                  stat.positive ? "text-emerald-600 border-emerald-100 bg-emerald-50" : "text-red-600 border-red-100 bg-red-50"
+                  "font-bold text-[10px] px-2.5 py-1 rounded-full border-none",
+                  stat.positive ? "text-emerald-700 bg-emerald-100" : "text-red-700 bg-red-100"
                 )}>
                   {stat.trend}
                 </Badge>
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                <div className="text-2xl font-bold text-primary">{stat.value}</div>
+                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{stat.title}</p>
+                <div className="text-3xl font-black text-primary tracking-tight">{stat.value}</div>
+                <p className="text-[11px] text-muted-foreground/70 font-medium">{stat.description}</p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          <Card className="border-none shadow-sm min-h-[400px] flex flex-col">
-            <CardHeader>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Main Analytics Area */}
+        <div className="lg:col-span-8 space-y-8">
+          <Card className="border-none shadow-sm min-h-[450px] flex flex-col bg-white rounded-3xl overflow-hidden">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg font-bold text-primary">Revenue Trends</CardTitle>
-                  <CardDescription>Visual performance metrics (Weekly)</CardDescription>
+                  <CardTitle className="text-xl font-bold text-primary">Market Performance</CardTitle>
+                  <CardDescription>Financial transaction trends over the current week</CardDescription>
                 </div>
-                {chartData.length > 0 && (
-                  <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm">
-                    <ArrowUpRight className="h-4 w-4" /> Real-time
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                    <div className="h-3 w-3 rounded-full bg-primary" /> Previous
                   </div>
-                )}
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
+                    <div className="h-3 w-3 rounded-full bg-accent" /> Projected
+                  </div>
+                </div>
               </div>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col justify-center">
-              {chartData.length > 0 ? (
-                <div className="h-[300px] w-full pt-4">
+            <CardContent className="flex-1 flex flex-col justify-center pt-6">
+              {chartData.some(d => d.total > 0) ? (
+                <div className="h-[320px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
                       <XAxis 
                         dataKey="name" 
-                        stroke="#888888" 
+                        stroke="#94a3b8" 
                         fontSize={12} 
                         tickLine={false} 
                         axisLine={false} 
+                        dy={10}
                       />
                       <YAxis 
-                        stroke="#888888" 
-                        fontSize={12} 
+                        stroke="#94a3b8" 
+                        fontSize={11} 
                         tickLine={false} 
                         axisLine={false} 
-                        tickFormatter={(value) => `K ${value/1000}k`}
+                        tickFormatter={(value) => `K ${value >= 1000 ? value/1000 + 'k' : value}`}
                       />
                       <Tooltip 
-                        cursor={{fill: '#f8fafc'}}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                        cursor={{fill: '#f1f5f9'}}
+                        contentStyle={{ 
+                          borderRadius: '16px', 
+                          border: 'none', 
+                          boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+                          padding: '12px 16px'
+                        }}
+                        itemStyle={{ fontWeight: 'bold', color: '#e15d2a' }}
                       />
-                      <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                      <Bar dataKey="total" radius={[8, 8, 0, 0]} barSize={40}>
                         {chartData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index === chartData.length - 1 ? '#e15d2a' : '#2d4b38'} />
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.total === Math.max(...chartData.map(d => d.total)) ? '#e15d2a' : '#2d4b38'} 
+                            className="transition-all duration-500 hover:opacity-80"
+                          />
                         ))}
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center text-center py-12 space-y-4 opacity-40">
-                  <div className="bg-slate-100 p-6 rounded-full">
-                    <BarChart3 className="h-12 w-12 text-slate-400" />
+                <div className="flex flex-col items-center justify-center text-center py-20 space-y-6 opacity-40">
+                  <div className="bg-slate-100 p-8 rounded-full">
+                    <BarChart3 className="h-16 w-16 text-slate-400" />
                   </div>
-                  <div>
-                    <p className="font-bold text-slate-600">No Sales Data Available</p>
-                    <p className="text-sm text-slate-500 max-w-xs mx-auto">Once you record your first sale, the analytics chart will populate automatically.</p>
+                  <div className="space-y-1">
+                    <p className="text-xl font-bold text-slate-600">Market Data Pending</p>
+                    <p className="text-sm text-slate-500 max-w-xs mx-auto">Visual performance metrics will populate here as sales are recorded.</p>
                   </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm overflow-hidden">
-            <CardHeader className="bg-white border-b">
-              <CardTitle className="text-lg font-bold flex items-center">
-                <Truck className="mr-2 h-5 w-5 text-accent" />
-                Recent Logistics Activity
-              </CardTitle>
+          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
+            <CardHeader className="border-b bg-slate-50/30">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-bold flex items-center gap-2">
+                  <Warehouse className="h-5 w-5 text-accent" />
+                  Network Distribution Summary
+                </CardTitle>
+                <Link href="/admin/warehouses" className="text-xs font-black uppercase tracking-widest text-accent hover:underline">
+                  View Network Map
+                </Link>
+              </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y">
-                {recentDeliveries.length > 0 ? recentDeliveries.map((delivery: any, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      <div className="bg-slate-100 p-2.5 rounded-full">
-                        <Clock className="h-4 w-4 text-slate-500" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-primary">{delivery.customerName}</p>
-                        <p className="text-xs text-muted-foreground">{delivery.location}</p>
-                      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+                {warehouseStats.length > 0 ? warehouseStats.map((w, i) => (
+                  <div key={i} className="p-6 space-y-3 hover:bg-slate-50 transition-colors cursor-default">
+                    <p className="text-xs font-black text-muted-foreground uppercase tracking-tighter">{w.name}</p>
+                    <div className="space-y-1">
+                      <div className="text-2xl font-black text-primary">{w.units}</div>
+                      <p className="text-[10px] text-muted-foreground font-bold">Total Physical Units</p>
                     </div>
-                    <Badge 
-                      className={cn(
-                        "font-bold",
-                        delivery.status === 'Out for Delivery' && "bg-blue-100 text-blue-700 hover:bg-blue-100 border-none",
-                        delivery.status === 'Pending' && "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-none",
-                        delivery.status === 'Delivered' && "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none",
-                        delivery.status === 'Cancelled' && "bg-slate-100 text-slate-500 hover:bg-slate-100 border-none"
-                      )}
-                    >
-                      {delivery.status}
-                    </Badge>
+                    <div className="flex items-center justify-between pt-2">
+                      <Badge className="bg-primary/5 text-primary text-[9px] font-black border-none px-2 py-0.5">
+                        {w.count} SKUs
+                      </Badge>
+                      <Link href={`/admin/warehouses/${w.id}`}>
+                        <ChevronRight className="h-4 w-4 text-slate-300 hover:text-accent" />
+                      </Link>
+                    </div>
                   </div>
                 )) : (
-                  <div className="p-12 text-center text-muted-foreground text-sm italic">
-                    Logistics log is empty. Dispatch your first trip to start tracking.
+                  <div className="col-span-4 p-12 text-center text-muted-foreground text-sm italic">
+                    No active storage locations recorded in the network.
                   </div>
                 )}
               </div>
@@ -242,62 +321,106 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        <div className="lg:col-span-1 space-y-8">
+        {/* Actionable Side Panel */}
+        <div className="lg:col-span-4 space-y-8">
           <Card className={cn(
-            "border-none shadow-sm",
-            lowStockItems.length > 0 ? "bg-gradient-to-br from-red-50 to-white" : "bg-white"
+            "border-none shadow-lg rounded-3xl overflow-hidden transition-all duration-500",
+            lowStockItems.length > 0 ? "bg-red-600 text-white ring-4 ring-red-100" : "bg-white"
           )}>
-            <CardHeader className="flex flex-row items-center gap-2">
-              <div className={cn("p-2 rounded-lg", lowStockItems.length > 0 ? "bg-red-100" : "bg-emerald-100")}>
-                <AlertTriangle className={cn("h-5 w-5", lowStockItems.length > 0 ? "text-red-600" : "text-emerald-600")} />
-              </div>
-              <div>
-                <CardTitle className={cn("text-lg font-bold", lowStockItems.length > 0 ? "text-red-900" : "text-emerald-900")}>
-                  Inventory Alerts
-                </CardTitle>
-                <CardDescription className={lowStockItems.length > 0 ? "text-red-700/70" : "text-emerald-700/70"}>
-                  {lowStockItems.length > 0 ? "Restock required" : "Levels healthy"}
-                </CardDescription>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={cn("p-2 rounded-xl", lowStockItems.length > 0 ? "bg-white/20" : "bg-red-50")}>
+                    <AlertTriangle className={cn("h-5 w-5", lowStockItems.length > 0 ? "text-white" : "text-red-600")} />
+                  </div>
+                  <CardTitle className="text-lg font-bold">Stock Alerts</CardTitle>
+                </div>
+                {lowStockItems.length > 0 && <span className="animate-pulse h-2 w-2 bg-white rounded-full" />}
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {lowStockItems.length > 0 ? lowStockItems.map((item: any, i) => (
-                  <div key={i} className="p-3 bg-white rounded-xl border border-red-100 shadow-sm flex flex-col gap-1 transition-all hover:border-red-300">
+                  <div key={i} className="p-4 bg-white/10 rounded-2xl border border-white/20 flex flex-col gap-1.5 transition-all hover:bg-white/20">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-primary">{item.name}</span>
-                      <Badge variant="destructive" className="font-bold text-[10px]">
+                      <span className="font-bold text-sm truncate pr-4">{item.name}</span>
+                      <Badge className="bg-white text-red-600 font-black text-[10px] rounded-lg">
                         {item.stock} LEFT
                       </Badge>
                     </div>
-                    <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{item.category}</span>
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest opacity-70">
+                      <span>{item.category}</span>
+                      <span className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" /> {item.warehouseLocation || 'Unassigned'}
+                      </span>
+                    </div>
                   </div>
                 )) : (
-                  <div className="text-sm text-muted-foreground py-8 text-center bg-slate-50 rounded-xl border border-dashed">
-                    No low stock items.
+                  <div className="text-center py-10 space-y-3 opacity-60">
+                    <div className="h-12 w-12 bg-emerald-100 rounded-full mx-auto flex items-center justify-center text-emerald-600">
+                      <ShieldCheck className="h-6 w-6" />
+                    </div>
+                    <p className="text-sm font-bold">Inventory Levels Stable</p>
                   </div>
                 )}
               </div>
-              <Button className="w-full mt-6 bg-primary hover:bg-primary/90 h-11 font-bold rounded-xl" asChild>
+              <Button 
+                className={cn(
+                  "w-full mt-6 h-12 font-bold rounded-2xl shadow-lg transition-all",
+                  lowStockItems.length > 0 ? "bg-white text-red-600 hover:bg-white/90" : "bg-primary text-white"
+                )} 
+                asChild
+              >
                 <Link href="/admin/products">Inventory Manager</Link>
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm bg-primary text-primary-foreground overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Users className="h-24 w-24" />
-            </div>
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Business Growth</CardTitle>
-              <CardDescription className="text-primary-foreground/60">Interaction Insights</CardDescription>
+          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
+            <CardHeader className="pb-4 flex flex-row items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-accent" />
+                <CardTitle className="text-lg font-bold text-primary">Live Dispatch</CardTitle>
+              </div>
+              <Badge variant="outline" className="border-accent text-accent font-black text-[9px] uppercase">Mombasa Hub</Badge>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="text-3xl font-bold">{sales?.length || 0}</div>
-                <p className="text-sm text-primary-foreground/70">Total customer transactions processed this period.</p>
-                <Button variant="secondary" className="w-full font-bold h-11 rounded-xl" asChild>
-                  <Link href="/admin/sales">Record New Sale</Link>
+            <CardContent className="p-0">
+              <div className="divide-y divide-slate-50">
+                {deliveries?.slice(0, 5).length > 0 ? deliveries.slice(0, 5).map((delivery: any, i) => (
+                  <div key={i} className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center space-x-4 min-w-0">
+                      <div className={cn(
+                        "p-2 rounded-xl flex-shrink-0",
+                        delivery.status === 'Delivered' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'
+                      )}>
+                        {delivery.status === 'Delivered' ? <ShieldCheck className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-primary truncate text-sm">{delivery.customerName}</p>
+                        <p className="text-[10px] text-muted-foreground font-medium uppercase truncate">{delivery.location}</p>
+                      </div>
+                    </div>
+                    <Badge 
+                      className={cn(
+                        "font-black text-[9px] uppercase px-2 py-0.5 rounded-lg border-none",
+                        delivery.status === 'Out for Delivery' && "bg-blue-100 text-blue-700",
+                        delivery.status === 'Pending' && "bg-yellow-100 text-yellow-700",
+                        delivery.status === 'Delivered' && "bg-emerald-100 text-emerald-700",
+                        delivery.status === 'Cancelled' && "bg-slate-100 text-slate-500"
+                      )}
+                    >
+                      {delivery.status}
+                    </Badge>
+                  </div>
+                )) : (
+                  <div className="p-12 text-center text-muted-foreground text-sm italic opacity-50">
+                    No active dispatches found.
+                  </div>
+                )}
+              </div>
+              <div className="p-4 bg-slate-50/50 border-t">
+                <Button variant="ghost" className="w-full font-black text-[11px] uppercase tracking-[0.2em] text-accent hover:bg-accent/5" asChild>
+                  <Link href="/admin/deliveries">Track All Logistics</Link>
                 </Button>
               </div>
             </CardContent>
