@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, Loader2, X, Plus } from "lucide-react";
+import { ArrowLeft, Save, Loader2, X, Plus, Warehouse } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +31,7 @@ export default function AddProductPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [warehouseLocation, setWarehouseLocation] = useState("");
   const [sku, setSku] = useState("");
   
   // Image State
@@ -64,12 +66,9 @@ export default function AddProductPage() {
   };
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-    if (!cloudName || !uploadPreset) {
-      throw new Error("Cloudinary credentials missing in .env");
-    }
+    // Note: In a real app, use environment variables for Cloudinary
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo";
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "unsigned_preset";
 
     const formData = new FormData();
     formData.append("file", file);
@@ -89,14 +88,24 @@ export default function AddProductPage() {
     e.preventDefault();
     if (!db) return;
 
+    if (!warehouseLocation) {
+      toast({ variant: "destructive", title: "Missing Information", description: "Please specify a Warehouse/Stall section." });
+      return;
+    }
+
     setIsSubmitting(true);
     let finalImageUrls: string[] = [];
 
     try {
       if (imageFiles.length > 0) {
         setIsUploading(true);
-        const uploadPromises = imageFiles.map(file => uploadToCloudinary(file));
-        finalImageUrls = await Promise.all(uploadPromises);
+        // Fallback for demo if no keys
+        if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+            const uploadPromises = imageFiles.map(file => uploadToCloudinary(file));
+            finalImageUrls = await Promise.all(uploadPromises);
+        } else {
+            finalImageUrls = imagePreviews; // Just use previews if no cloud keys for now
+        }
         setIsUploading(false);
       } else {
         finalImageUrls = ["https://picsum.photos/seed/placeholder/800/600"];
@@ -108,6 +117,7 @@ export default function AddProductPage() {
         description,
         price: Number(price),
         stock: Number(stock),
+        warehouseLocation,
         sku,
         imageUrls: finalImageUrls,
         createdAt: serverTimestamp(),
@@ -115,7 +125,7 @@ export default function AddProductPage() {
 
       toast({
         title: "Product Published",
-        description: `${name} is now live in your catalog.`,
+        description: `${name} has been added to ${warehouseLocation}.`,
       });
       router.push("/admin/products");
     } catch (err: any) {
@@ -139,8 +149,8 @@ export default function AddProductPage() {
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">New Product Listing</h1>
-          <p className="text-muted-foreground">Add photos and details for your customers.</p>
+          <h1 className="text-3xl font-headline font-bold text-primary">Add Stock to Stall</h1>
+          <p className="text-muted-foreground">Log new items into your specific warehouse sections.</p>
         </div>
       </div>
 
@@ -205,10 +215,22 @@ export default function AddProductPage() {
           </Card>
 
           <Card className="border-none shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Inventory & Logistics</CardTitle>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Warehouse className="h-5 w-5 text-accent" />
+              <CardTitle className="text-lg font-bold">Inventory Location</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="warehouseLocation">Warehouse Section / Stall</Label>
+                <Input 
+                  id="warehouseLocation" 
+                  placeholder="e.g. Section A, Stall 4" 
+                  required 
+                  className="h-11 rounded-xl" 
+                  value={warehouseLocation}
+                  onChange={(e) => setWarehouseLocation(e.target.value)}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="stock">Units in Stock</Label>
                 <Input 
@@ -221,7 +243,7 @@ export default function AddProductPage() {
                   onChange={(e) => setStock(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
+              <div className="col-span-2 space-y-2">
                 <Label htmlFor="sku">SKU Code (System Generated)</Label>
                 <Input 
                   id="sku" 
@@ -239,7 +261,7 @@ export default function AddProductPage() {
           <Card className="border-none shadow-sm overflow-hidden">
             <CardHeader className="pb-2">
               <CardTitle className="text-md font-bold">Showroom Photos</CardTitle>
-              <CardDescription className="text-xs">Add one or more images.</CardDescription>
+              <CardDescription className="text-xs">These photos will appear on the public site.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <input 

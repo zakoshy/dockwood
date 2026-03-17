@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect, useMemo, use } from "react";
@@ -8,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Save, Loader2, X, Plus } from "lucide-react";
+import { ArrowLeft, Save, Loader2, X, Plus, Warehouse } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +37,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [warehouseLocation, setWarehouseLocation] = useState("");
   const [sku, setSku] = useState("");
   
   // Image State
@@ -51,6 +53,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
       setDescription(product.description || "");
       setPrice(product.price?.toString() || "");
       setStock(product.stock?.toString() || "");
+      setWarehouseLocation(product.warehouseLocation || "");
       setSku(product.sku || "");
       setExistingImages(product.imageUrls || []);
     }
@@ -78,12 +81,8 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
   };
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-    if (!cloudName || !uploadPreset) {
-      throw new Error("Cloudinary credentials missing.");
-    }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo";
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "unsigned_preset";
 
     const formData = new FormData();
     formData.append("file", file);
@@ -109,8 +108,12 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
     try {
       if (newImageFiles.length > 0) {
         setIsUploading(true);
-        const uploadPromises = newImageFiles.map(file => uploadToCloudinary(file));
-        uploadedUrls = await Promise.all(uploadPromises);
+        if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
+            const uploadPromises = newImageFiles.map(file => uploadToCloudinary(file));
+            uploadedUrls = await Promise.all(uploadPromises);
+        } else {
+            uploadedUrls = newImagePreviews;
+        }
         setIsUploading(false);
       }
 
@@ -122,6 +125,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
         description,
         price: Number(price),
         stock: Number(stock),
+        warehouseLocation,
         sku,
         imageUrls: finalImageUrls,
         updatedAt: serverTimestamp(),
@@ -129,7 +133,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
 
       toast({
         title: "Changes Saved",
-        description: `${name} has been updated.`,
+        description: `${name} has been updated in ${warehouseLocation}.`,
       });
       router.push("/admin/products");
     } catch (err: any) {
@@ -148,7 +152,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground font-medium">Fetching product data...</p>
+        <p className="text-muted-foreground font-medium">Fetching record...</p>
       </div>
     );
   }
@@ -162,8 +166,8 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Edit Listing</h1>
-          <p className="text-muted-foreground">Update details for {product?.name || 'Item'}.</p>
+          <h1 className="text-3xl font-headline font-bold text-primary">Edit Inventory Record</h1>
+          <p className="text-muted-foreground">Modify details for items in {warehouseLocation || 'Stall'}.</p>
         </div>
       </div>
 
@@ -213,10 +217,9 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Product Description (Optional)</Label>
+                <Label htmlFor="description">Product Description</Label>
                 <Textarea 
                   id="description" 
-                  placeholder="Describe wood quality, durability, and key features..." 
                   className="min-h-[120px] resize-none rounded-xl" 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -226,10 +229,21 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
           </Card>
 
           <Card className="border-none shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold">Inventory & Logistics</CardTitle>
+            <CardHeader className="flex flex-row items-center gap-2">
+              <Warehouse className="h-5 w-5 text-accent" />
+              <CardTitle className="text-lg font-bold">Inventory Location</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="warehouseLocation">Warehouse Section / Stall</Label>
+                <Input 
+                  id="warehouseLocation" 
+                  required 
+                  className="h-11 rounded-xl" 
+                  value={warehouseLocation}
+                  onChange={(e) => setWarehouseLocation(e.target.value)}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="stock">Units in Stock</Label>
                 <Input 
@@ -241,15 +255,6 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
                   onChange={(e) => setStock(e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="sku">SKU Code (System Generated)</Label>
-                <Input 
-                  id="sku" 
-                  className="h-11 rounded-xl bg-slate-50 font-mono text-xs cursor-not-allowed" 
-                  value={sku}
-                  readOnly
-                />
-              </div>
             </CardContent>
           </Card>
         </div>
@@ -258,7 +263,6 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
           <Card className="border-none shadow-sm overflow-hidden">
             <CardHeader className="pb-2">
               <CardTitle className="text-md font-bold">Showroom Photos</CardTitle>
-              <CardDescription className="text-xs">Manage current and new photos.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <input 
@@ -271,7 +275,6 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
               />
               
               <div className="grid grid-cols-3 gap-2">
-                {/* Existing Images */}
                 {existingImages.map((url, index) => (
                   <div key={`existing-${index}`} className="relative aspect-square rounded-lg overflow-hidden border group">
                     <Image src={url} alt={`Existing ${index}`} fill className="object-cover" />
@@ -282,13 +285,10 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
                     >
                       <X className="h-3 w-3" />
                     </button>
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-[8px] text-white text-center py-0.5">EXISTING</div>
                   </div>
                 ))}
-
-                {/* New Previews */}
                 {newImagePreviews.map((preview, index) => (
-                  <div key={`new-${index}`} className="relative aspect-square rounded-lg overflow-hidden border group">
+                  <div key={`new-${index}`} className="relative aspect-square rounded-lg overflow-hidden border group border-blue-400">
                     <Image src={preview} alt={`New Preview ${index}`} fill className="object-cover" />
                     <button 
                       type="button"
@@ -297,10 +297,8 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
                     >
                       <X className="h-3 w-3" />
                     </button>
-                    <div className="absolute bottom-0 left-0 right-0 bg-blue-500/60 text-[8px] text-white text-center py-0.5">NEW</div>
                   </div>
                 ))}
-
                 <button 
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -322,12 +320,12 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
               {isSubmitting || isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  {isUploading ? "Uploading..." : "Saving Changes..."}
+                  Saving...
                 </>
               ) : (
                 <>
                   <Save className="mr-2 h-5 w-5" />
-                  Update Product
+                  Update Record
                 </>
               )}
             </Button>

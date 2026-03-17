@@ -11,6 +11,7 @@
         "description": { "type": "string" },
         "price": { "type": "number" },
         "stock": { "type": "number" },
+        "warehouseLocation": { "type": "string", "description": "The specific stall or warehouse section (e.g., Section A, Stall 4)." },
         "imageUrls": { 
           "type": "array",
           "items": { "type": "string" }
@@ -18,7 +19,7 @@
         "sku": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["name", "category", "price", "stock"]
+      "required": ["name", "category", "price", "stock", "warehouseLocation"]
     },
     "Sale": {
       "title": "Sale",
