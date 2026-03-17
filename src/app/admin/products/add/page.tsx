@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect, Suspense } from "react";
+import { useState, useRef, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,9 +40,12 @@ function AddProductForm() {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
-  const { data: warehouses } = useCollection(
-    useMemo(() => (db ? query(collection(db, "warehouses"), orderBy("name", "asc")) : null), [db])
-  );
+  const warehousesQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "warehouses"), orderBy("name", "asc"));
+  }, [db]);
+
+  const { data: warehouses } = useCollection(warehousesQuery);
 
   // Auto-generate SKU
   useEffect(() => {
@@ -186,7 +189,8 @@ function AddProductForm() {
               <Label htmlFor="warehouseSelect">Assigned Warehouse / Stall</Label>
               <Select onValueChange={(val) => {
                 setWarehouseId(val);
-                setWarehouseLocation(warehouses?.find((w: any) => w.id === val)?.name || "");
+                const locationName = warehouses?.find((w: any) => w.id === val)?.name || "";
+                setWarehouseLocation(locationName);
               }} required value={warehouseId}>
                 <SelectTrigger className="h-11 rounded-xl">
                   <SelectValue placeholder="Select warehouse" />
@@ -314,8 +318,3 @@ export default function AddProductPage() {
     </div>
   );
 }
-
-function useMemo(arg0: () => import("firebase/firestore").Query<import("firebase/firestore").DocumentData, import("firebase/firestore").DocumentData> | null, arg1: (import("firebase/firestore").Firestore | null)[]) {
-  return React.useMemo(arg0, arg1);
-}
-import * as React from "react";
