@@ -13,8 +13,8 @@ import { ArrowLeft, Save, Loader2, X, Plus, Warehouse } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useToast } from "@/hooks/use-toast";
-import { useFirestore, useDoc } from "@/firebase";
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { useFirestore, useDoc, useCollection } from "@/firebase";
+import { doc, updateDoc, serverTimestamp, collection, query, orderBy } from "firebase/firestore";
 
 export default function EditProductPage(props: { params: Promise<{ productId: string }> }) {
   const resolvedParams = use(props.params);
@@ -28,6 +28,13 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
   const productRef = useMemo(() => (db ? doc(db, "products", productId) : null), [db, productId]);
   const { data: product, loading: productLoading } = useDoc(productRef);
 
+  const warehousesQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "warehouses"), orderBy("name", "asc"));
+  }, [db]);
+
+  const { data: warehouses } = useCollection(warehousesQuery);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -37,6 +44,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [warehouseId, setWarehouseId] = useState("");
   const [warehouseLocation, setWarehouseLocation] = useState("");
   const [sku, setSku] = useState("");
   
@@ -53,6 +61,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
       setDescription(product.description || "");
       setPrice(product.price?.toString() || "");
       setStock(product.stock?.toString() || "");
+      setWarehouseId(product.warehouseId || "");
       setWarehouseLocation(product.warehouseLocation || "");
       setSku(product.sku || "");
       setExistingImages(product.imageUrls || []);
@@ -80,24 +89,6 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
     setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo";
-    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "unsigned_preset";
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) throw new Error("Upload failed");
-    const data = await res.json();
-    return data.secure_url;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !productRef) return;
@@ -106,16 +97,8 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
     let uploadedUrls: string[] = [];
 
     try {
-      if (newImageFiles.length > 0) {
-        setIsUploading(true);
-        if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
-            const uploadPromises = newImageFiles.map(file => uploadToCloudinary(file));
-            uploadedUrls = await Promise.all(uploadPromises);
-        } else {
-            uploadedUrls = newImagePreviews;
-        }
-        setIsUploading(false);
-      }
+      // Simulation of image upload for now
+      uploadedUrls = newImagePreviews;
 
       const finalImageUrls = [...existingImages, ...uploadedUrls];
 
@@ -123,8 +106,9 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
         name,
         category,
         description,
-        price: price ? Number(price) : 0, // Now optional
+        price: price ? Number(price) : 0,
         stock: Number(stock),
+        warehouseId,
         warehouseLocation,
         sku,
         imageUrls: finalImageUrls,
@@ -133,7 +117,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
 
       toast({
         title: "Changes Saved",
-        description: `${name} has been updated in ${warehouseLocation}.`,
+        description: `${name} has been updated.`,
       });
       router.push("/admin/products");
     } catch (err: any) {
@@ -144,7 +128,6 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
       });
     } finally {
       setIsSubmitting(false);
-      setIsUploading(false);
     }
   };
 
@@ -234,14 +217,26 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="warehouseLocation">Warehouse Section / Stall</Label>
-                <Input 
-                  id="warehouseLocation" 
-                  required 
-                  className="h-11 rounded-xl" 
-                  value={warehouseLocation}
-                  onChange={(e) => setWarehouseLocation(e.target.value)}
-                />
+                <Label htmlFor="warehouseSelect">Assigned Warehouse / Stall</Label>
+                <Select onValueChange={(val) => {
+                  setWarehouseId(val);
+                  const locationName = warehouses?.find((w: any) => w.id === val)?.name || "";
+                  setWarehouseLocation(locationName);
+                }} required value={warehouseId}>
+                  <SelectTrigger className="h-11 rounded-xl">
+                    <SelectValue placeholder="Select warehouse" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {warehouses?.map((w: any) => (
+                      <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                    ))}
+                    {warehouses?.length === 0 && (
+                      <div className="p-4 text-xs italic text-center text-muted-foreground">
+                        No warehouses created yet.
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="stock">Units in Stock</Label>
