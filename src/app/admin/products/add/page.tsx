@@ -66,7 +66,6 @@ export default function AddProductPage() {
   };
 
   const uploadToCloudinary = async (file: File): Promise<string> => {
-    // Note: In a real app, use environment variables for Cloudinary
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo";
     const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "unsigned_preset";
 
@@ -99,12 +98,11 @@ export default function AddProductPage() {
     try {
       if (imageFiles.length > 0) {
         setIsUploading(true);
-        // Fallback for demo if no keys
         if (process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
             const uploadPromises = imageFiles.map(file => uploadToCloudinary(file));
             finalImageUrls = await Promise.all(uploadPromises);
         } else {
-            finalImageUrls = imagePreviews; // Just use previews if no cloud keys for now
+            finalImageUrls = imagePreviews; 
         }
         setIsUploading(false);
       } else {
@@ -115,7 +113,7 @@ export default function AddProductPage() {
         name,
         category,
         description,
-        price: Number(price),
+        price: price ? Number(price) : 0, // Now optional
         stock: Number(stock),
         warehouseLocation,
         sku,
@@ -189,14 +187,13 @@ export default function AddProductPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price (KES)</Label>
+                  <Label htmlFor="price">Price (KES) <span className="text-muted-foreground font-normal">(Optional)</span></Label>
                   <Input 
                     id="price" 
                     type="number" 
                     placeholder="45000" 
                     className="h-11 rounded-xl" 
                     value={price}
-                    required
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>

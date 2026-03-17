@@ -123,7 +123,7 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
         name,
         category,
         description,
-        price: Number(price),
+        price: price ? Number(price) : 0, // Now optional
         stock: Number(stock),
         warehouseLocation,
         sku,
@@ -205,13 +205,12 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="price">Price (KES)</Label>
+                  <Label htmlFor="price">Price (KES) <span className="text-muted-foreground font-normal">(Optional)</span></Label>
                   <Input 
                     id="price" 
                     type="number" 
                     className="h-11 rounded-xl" 
                     value={price}
-                    required
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </div>

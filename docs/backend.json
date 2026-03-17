@@ -19,7 +19,7 @@
         "sku": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["name", "category", "price", "stock", "warehouseLocation"]
+      "required": ["name", "category", "stock", "warehouseLocation"]
     },
     "Sale": {
       "title": "Sale",
