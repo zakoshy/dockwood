@@ -1,6 +1,17 @@
 
 {
   "entities": {
+    "Warehouse": {
+      "title": "Warehouse",
+      "description": "A physical location or stall where products are stored.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name"]
+    },
     "Product": {
       "title": "Product",
       "description": "A timber or furniture product in the catalog.",
@@ -11,7 +22,8 @@
         "description": { "type": "string" },
         "price": { "type": "number" },
         "stock": { "type": "number" },
-        "warehouseLocation": { "type": "string", "description": "The specific stall or warehouse section (e.g., Section A, Stall 4)." },
+        "warehouseId": { "type": "string", "description": "The ID of the warehouse entity." },
+        "warehouseLocation": { "type": "string", "description": "Legacy text location/stall name." },
         "imageUrls": { 
           "type": "array",
           "items": { "type": "string" }
@@ -19,7 +31,7 @@
         "sku": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["name", "category", "stock", "warehouseLocation"]
+      "required": ["name", "category", "stock"]
     },
     "Sale": {
       "title": "Sale",
@@ -69,6 +81,10 @@
     "providers": ["password"]
   },
   "firestore": {
+    "/warehouses/{warehouseId}": {
+      "schema": "Warehouse",
+      "description": "Physical warehouse locations."
+    },
     "/products/{productId}": {
       "schema": "Product",
       "description": "Collection of all products in the catalog."

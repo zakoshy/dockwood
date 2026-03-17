@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Search, Plus, Edit2, Trash2, ArrowUpDown, Filter, Loader2, Warehouse } from "lucide-react";
+import { Search, Plus, Edit2, Trash2, ArrowUpDown, Filter, Loader2, Warehouse, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +33,7 @@ export default function AdminProducts() {
 
   const productsRef = useMemo(() => {
     if (!db) return null;
-    return query(collection(db, "products"), orderBy("warehouseLocation", "asc"));
+    return query(collection(db, "products"), orderBy("createdAt", "desc"));
   }, [db]);
 
   const { data: products, loading } = useCollection(productsRef);
@@ -72,31 +72,34 @@ export default function AdminProducts() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-headline font-bold text-primary">Warehouse Inventory</h1>
-          <p className="text-muted-foreground">Manage your stock across different workshop sections and stalls.</p>
+          <h1 className="text-3xl font-headline font-bold text-primary">Master Inventory</h1>
+          <p className="text-muted-foreground">Comprehensive list of all items across your entire network.</p>
         </div>
-        <Button asChild className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20 h-11 px-6 rounded-xl font-bold">
-          <Link href="/admin/products/add">
-            <Plus className="mr-2 h-5 w-5" /> Add New Item
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild className="h-11 px-6 rounded-xl font-bold">
+            <Link href="/admin/warehouses">
+              <Warehouse className="mr-2 h-5 w-5" /> Manage Locations
+            </Link>
+          </Button>
+          <Button asChild className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20 h-11 px-6 rounded-xl font-bold">
+            <Link href="/admin/products/add">
+              <Plus className="mr-2 h-5 w-5" /> Add New Item
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <Card className="border-none shadow-sm overflow-hidden">
+      <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardHeader className="p-6 border-b bg-white">
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input 
-                placeholder="Search by name, stall or category..." 
+                placeholder="Search by name, SKU or category..." 
                 className="pl-10 h-11 bg-slate-50 border-none rounded-xl"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className="h-11 rounded-xl"><Warehouse className="mr-2 h-4 w-4" /> By Stall</Button>
-              <Button variant="outline" className="h-11 rounded-xl"><Filter className="mr-2 h-4 w-4" /> Filter</Button>
             </div>
           </div>
         </CardHeader>
@@ -108,16 +111,16 @@ export default function AdminProducts() {
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="p-20 text-center text-muted-foreground">
-                No inventory items found. Start by adding stock to a stall.
+                No inventory items found.
               </div>
             ) : (
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-primary uppercase bg-slate-50/50">
                   <tr>
-                    <th className="px-6 py-5">Item</th>
-                    <th className="px-6 py-5">Location / Stall</th>
+                    <th className="px-6 py-5">Item Details</th>
+                    <th className="px-6 py-5">Storage Location</th>
                     <th className="px-6 py-5">Category</th>
-                    <th className="px-6 py-5 text-center">Qty</th>
+                    <th className="px-6 py-5 text-center">Stock</th>
                     <th className="px-6 py-5 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -136,28 +139,35 @@ export default function AdminProducts() {
                           </div>
                           <div className="flex flex-col">
                             <span className="font-bold text-primary group-hover:text-accent transition-colors">{product.name}</span>
-                            <span className="text-[10px] text-muted-foreground font-mono">KES {product.price?.toLocaleString()}</span>
+                            <span className="text-[10px] text-muted-foreground font-mono">SKU: {product.sku}</span>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge variant="outline" className="font-bold bg-blue-50 text-blue-700 border-blue-100 py-1">
-                          <Warehouse className="mr-1.5 h-3 w-3" />
-                          {product.warehouseLocation || "Unassigned"}
-                        </Badge>
+                        {product.warehouseId ? (
+                          <Link href={`/admin/warehouses/${product.warehouseId}`}>
+                            <Badge variant="outline" className="font-bold bg-blue-50 text-blue-700 border-blue-100 py-1 cursor-pointer hover:bg-blue-100">
+                              <Warehouse className="mr-1.5 h-3 w-3" />
+                              {product.warehouseLocation}
+                            </Badge>
+                          </Link>
+                        ) : (
+                          <Badge variant="outline" className="font-bold bg-red-50 text-red-600 border-red-100 py-1">
+                            <AlertTriangle className="mr-1.5 h-3 w-3" />
+                            Unassigned Stall
+                          </Badge>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <Badge variant="secondary" className="font-bold bg-slate-100 text-slate-700">{product.category}</Badge>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <div className="flex flex-col items-center">
-                          <span className={cn(
-                            "font-bold text-base",
-                            (product.stock || 0) < 5 ? 'text-red-600' : 'text-emerald-600'
-                          )}>
-                            {product.stock || 0}
-                          </span>
-                        </div>
+                        <span className={cn(
+                          "font-bold text-base",
+                          (product.stock || 0) < 5 ? 'text-red-600' : 'text-emerald-600'
+                        )}>
+                          {product.stock || 0}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
@@ -196,9 +206,9 @@ export default function AdminProducts() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-headline font-bold text-primary text-xl">Remove from Inventory</AlertDialogTitle>
+            <AlertDialogTitle className="font-headline font-bold text-primary text-xl">Confirm Removal</AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground text-sm">
-              This will permanently delete this item record from its assigned stall.
+              This will permanently delete this item record from the master inventory.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
