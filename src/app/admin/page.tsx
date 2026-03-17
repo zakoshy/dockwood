@@ -19,7 +19,9 @@ import {
   BarChart3,
   Warehouse,
   ChevronRight,
-  Layers
+  Layers,
+  MapPin,
+  ShieldCheck
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
