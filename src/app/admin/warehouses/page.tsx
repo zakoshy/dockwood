@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Warehouse, Plus, Search, Loader2, ChevronRight, MapPin, Package, Trash2 } from "lucide-react";
+import { Warehouse, Plus, Search, Loader2, ChevronRight, MapPin, Package, Trash2, Edit2 } from "lucide-react";
 import Link from "next/link";
 import { useCollection, useFirestore } from "@/firebase";
-import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc } from "firebase/firestore";
+import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Dialog, 
@@ -40,9 +40,15 @@ export default function WarehousesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Form State
+  // Create Form State
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+
+  // Edit State
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   // Delete State
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -92,6 +98,42 @@ export default function WarehousesPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleUpdateWarehouse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!db || !editId) return;
+
+    setIsSubmitting(true);
+    try {
+      await updateDoc(doc(db, "warehouses", editId), {
+        name: editName,
+        description: editDescription,
+      });
+
+      toast({
+        title: "Warehouse Updated",
+        description: "The location details have been modified.",
+      });
+      
+      setIsEditDialogOpen(false);
+      setEditId(null);
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Update Failed",
+        description: err.message || "Failed to update warehouse.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openEditDialog = (warehouse: any) => {
+    setEditId(warehouse.id);
+    setEditName(warehouse.name);
+    setEditDescription(warehouse.description || "");
+    setIsEditDialogOpen(true);
   };
 
   const confirmDelete = async () => {
@@ -191,18 +233,31 @@ export default function WarehousesPage() {
                     <div className="p-3 bg-secondary rounded-2xl text-accent group-hover:bg-accent group-hover:text-white transition-colors">
                       <Warehouse className="h-6 w-6" />
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-slate-300 hover:text-red-600 rounded-xl"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setDeleteId(warehouse.id);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-slate-300 hover:text-accent rounded-xl"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openEditDialog(warehouse);
+                        }}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-slate-300 hover:text-red-600 rounded-xl"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setDeleteId(warehouse.id);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   
                   <div>
@@ -230,6 +285,42 @@ export default function WarehousesPage() {
           ))
         )}
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px] rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-headline font-bold text-primary">Edit Location</DialogTitle>
+            <DialogDescription>Update the credentials for this warehouse or stall.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleUpdateWarehouse} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-w-name">Warehouse/Stall Name</Label>
+              <Input 
+                id="edit-w-name" 
+                required 
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="rounded-xl h-11"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-w-desc">Description (Optional)</Label>
+              <Textarea 
+                id="edit-w-desc" 
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="rounded-xl min-h-[100px] resize-none"
+              />
+            </div>
+            <DialogFooter className="pt-4">
+              <Button type="submit" className="w-full bg-primary h-12 rounded-xl font-bold" disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="animate-spin" /> : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="rounded-2xl">
