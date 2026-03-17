@@ -13,6 +13,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useFirestore } from "@/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 interface ProductCardProps {
   id: string;
@@ -24,9 +26,20 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl }: ProductCardProps) {
+  const db = useFirestore();
   const displayImages = imageUrls && imageUrls.length > 0 ? imageUrls : [imageUrl || `https://picsum.photos/seed/${id}/600/450`];
 
-  const handleInquiry = () => {
+  const handleInquiry = async () => {
+    // Track inquiry interaction
+    if (db) {
+      addDoc(collection(db, "interactions"), {
+        type: "inquiry",
+        productName: name,
+        productId: id,
+        timestamp: serverTimestamp()
+      });
+    }
+
     const phoneNumber = "254711662626";
     const message = encodeURIComponent(`Hello Dockwood Furnitures, I would like to inquire about the price of ${name}.`);
     window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");

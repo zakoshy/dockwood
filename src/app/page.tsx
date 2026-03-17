@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
@@ -12,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProductCard } from "@/components/products/product-card";
 import { Truck, ShieldCheck, Clock, Hammer, MapPin, PhoneCall, Navigation, Loader2 } from "lucide-react";
 import { useCollection, useFirestore } from "@/firebase";
-import { collection, query, limit, orderBy } from "firebase/firestore";
+import { collection, query, limit, orderBy, addDoc, serverTimestamp } from "firebase/firestore";
 import {
   Carousel,
   CarouselContent,
@@ -23,6 +24,17 @@ import {
 export default function Home() {
   const db = useFirestore();
   const [api, setApi] = useState<CarouselApi>();
+
+  // Track page visit
+  useEffect(() => {
+    if (db) {
+      addDoc(collection(db, "interactions"), {
+        type: "visit",
+        page: "Home Page",
+        timestamp: serverTimestamp()
+      });
+    }
+  }, [db]);
 
   const featuredQuery = useMemo(() => {
     if (!db) return null;

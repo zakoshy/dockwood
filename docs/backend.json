@@ -50,6 +50,18 @@
         "timestamp": { "type": "string", "format": "date-time" }
       },
       "required": ["customerName", "location", "status"]
+    },
+    "Interaction": {
+      "title": "Interaction",
+      "description": "A log of user interaction on the public website.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["visit", "inquiry", "view_product"] },
+        "page": { "type": "string" },
+        "productName": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "timestamp"]
     }
   },
   "auth": {
@@ -67,6 +79,10 @@
     "/deliveries/{deliveryId}": {
       "schema": "Delivery",
       "description": "Tracking logs for all deliveries."
+    },
+    "/interactions/{interactionId}": {
+      "schema": "Interaction",
+      "description": "Log of user activity for analytics."
     }
   }
 }

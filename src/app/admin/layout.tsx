@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect } from "react";
@@ -11,7 +12,8 @@ import {
   LogOut, 
   ChevronRight,
   Menu,
-  Loader2
+  Loader2,
+  BarChart2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,6 +41,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Analytics", href: "/admin/analytics", icon: BarChart2 },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Sales", href: "/admin/sales", icon: ShoppingCart },
     { name: "Deliveries", href: "/admin/deliveries", icon: Truck },
