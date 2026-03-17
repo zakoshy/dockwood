@@ -75,7 +75,7 @@ export default function AdminDashboard() {
   const chartData = useMemo(() => {
     if (!sales || sales.length === 0) return [];
 
-    // Group sales by day of the week for the last few entries
+    // Group sales by day of the week
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const grouped = sales.reduce((acc: any, sale: any) => {
       const date = sale.timestamp?.toDate ? sale.timestamp.toDate() : new Date(sale.timestamp);
@@ -84,11 +84,10 @@ export default function AdminDashboard() {
       return acc;
     }, {});
 
-    // Return chronological order starting from 7 days ago or just common days
     return days.map(day => ({
       name: day,
       total: grouped[day] || 0
-    })).filter(d => d.total > 0 || sales.length > 5); // Only show populated chart if there's enough data
+    })).filter(d => d.total > 0 || sales.length > 5);
   }, [sales]);
 
   if (productsLoading || salesLoading || deliveriesLoading) {
@@ -100,14 +99,12 @@ export default function AdminDashboard() {
     );
   }
 
-  const hasData = sales.length > 0 || products.length > 0 || deliveries.length > 0;
-
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-headline font-bold text-primary tracking-tight">Business Intelligence</h1>
-          <p className="text-muted-foreground">Real-time overview of your workshop operations.</p>
+          <p className="text-muted-foreground">Real-time analytics of your workshop operations.</p>
         </div>
         <div className="flex gap-3">
           <Button asChild className="bg-accent hover:bg-accent/90 shadow-lg shadow-accent/20 h-11 px-6 rounded-xl font-bold">
@@ -149,7 +146,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-lg font-bold text-primary">Revenue Trends</CardTitle>
-                  <CardDescription>Visual performance metrics</CardDescription>
+                  <CardDescription>Visual performance metrics (Weekly)</CardDescription>
                 </div>
                 {chartData.length > 0 && (
                   <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm">
@@ -175,7 +172,7 @@ export default function AdminDashboard() {
                         fontSize={12} 
                         tickLine={false} 
                         axisLine={false} 
-                        tickFormatter={(value) => `KES ${value}`}
+                        tickFormatter={(value) => `K ${value/1000}k`}
                       />
                       <Tooltip 
                         cursor={{fill: '#f8fafc'}}
@@ -196,7 +193,7 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <p className="font-bold text-slate-600">No Sales Data Available</p>
-                    <p className="text-sm text-slate-500 max-w-xs mx-auto">Once you record your first sale, the revenue trend chart will appear here.</p>
+                    <p className="text-sm text-slate-500 max-w-xs mx-auto">Once you record your first sale, the analytics chart will populate automatically.</p>
                   </div>
                 </div>
               )}
@@ -237,13 +234,10 @@ export default function AdminDashboard() {
                   </div>
                 )) : (
                   <div className="p-12 text-center text-muted-foreground text-sm italic">
-                    Logistics log is empty. Dispatch your first trip from the deliveries tab.
+                    Logistics log is empty. Dispatch your first trip to start tracking.
                   </div>
                 )}
               </div>
-              <Button variant="ghost" className="w-full text-accent hover:bg-accent/5 rounded-none h-12 font-bold" asChild>
-                <Link href="/admin/deliveries">View All Logistics</Link>
-              </Button>
             </CardContent>
           </Card>
         </div>
@@ -259,17 +253,17 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <CardTitle className={cn("text-lg font-bold", lowStockItems.length > 0 ? "text-red-900" : "text-emerald-900")}>
-                  {lowStockItems.length > 0 ? "Inventory Alerts" : "Inventory Status"}
+                  Inventory Alerts
                 </CardTitle>
                 <CardDescription className={lowStockItems.length > 0 ? "text-red-700/70" : "text-emerald-700/70"}>
-                  {lowStockItems.length > 0 ? "Urgent restocking required" : "All stock levels healthy"}
+                  {lowStockItems.length > 0 ? "Restock required" : "Levels healthy"}
                 </CardDescription>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {lowStockItems.length > 0 ? lowStockItems.map((item: any, i) => (
-                  <div key={i} className="group p-3 bg-white rounded-xl border border-red-100 shadow-sm flex flex-col gap-1 transition-all hover:border-red-300">
+                  <div key={i} className="p-3 bg-white rounded-xl border border-red-100 shadow-sm flex flex-col gap-1 transition-all hover:border-red-300">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-primary">{item.name}</span>
                       <Badge variant="destructive" className="font-bold text-[10px]">
@@ -280,12 +274,12 @@ export default function AdminDashboard() {
                   </div>
                 )) : (
                   <div className="text-sm text-muted-foreground py-8 text-center bg-slate-50 rounded-xl border border-dashed">
-                    No items found with low stock.
+                    No low stock items.
                   </div>
                 )}
               </div>
               <Button className="w-full mt-6 bg-primary hover:bg-primary/90 h-11 font-bold rounded-xl" asChild>
-                <Link href="/admin/products">Open Inventory Manager</Link>
+                <Link href="/admin/products">Inventory Manager</Link>
               </Button>
             </CardContent>
           </Card>
@@ -296,14 +290,14 @@ export default function AdminDashboard() {
             </div>
             <CardHeader>
               <CardTitle className="text-lg font-bold">Business Growth</CardTitle>
-              <CardDescription className="text-primary-foreground/60">Automated Insights</CardDescription>
+              <CardDescription className="text-primary-foreground/60">Interaction Insights</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="text-3xl font-bold">{sales?.length || 0}</div>
-                <p className="text-sm text-primary-foreground/70">Total transactions processed this period.</p>
+                <p className="text-sm text-primary-foreground/70">Total customer transactions processed this period.</p>
                 <Button variant="secondary" className="w-full font-bold h-11 rounded-xl" asChild>
-                  <Link href="/admin/sales">Record Sale</Link>
+                  <Link href="/admin/sales">Record New Sale</Link>
                 </Button>
               </div>
             </CardContent>
