@@ -17,7 +17,8 @@ import {
   X,
   Warehouse,
   ChevronRight,
-  Package
+  Package,
+  Maximize2
 } from "lucide-react";
 import Image from "next/image";
 import { useCollection, useFirestore } from "@/firebase";
@@ -67,6 +68,9 @@ export default function MaterialsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
+  // Viewer State
+  const [viewingImage, setViewingImage] = useState<string | null>(null);
+
   const { data: materials, loading } = useCollection(
     useMemo(() => (db ? query(collection(db, "materials"), orderBy("createdAt", "desc")) : null), [db])
   );
@@ -108,9 +112,9 @@ export default function MaterialsPage() {
         name,
         type,
         quantity,
-        description,
-        warehouseId,
-        warehouseLocation,
+        description: description || "", // Optional
+        warehouseId: warehouseId || "unassigned", // Optional
+        warehouseLocation: warehouseLocation || "General Stock", // Optional
         imageUrls: imagePreviews.length > 0 ? imagePreviews : ["https://picsum.photos/seed/material/800/600"],
         createdAt: serverTimestamp(),
       });
@@ -190,7 +194,7 @@ export default function MaterialsPage() {
                   <Input required placeholder="e.g. 50 pcs, 10 rolls" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Stall Location</Label>
+                  <Label>Stall Location (Optional)</Label>
                   <Select onValueChange={(val) => {
                     setWarehouseId(val);
                     setWarehouseLocation(warehouses?.find((w: any) => w.id === val)?.name || "");
@@ -206,7 +210,7 @@ export default function MaterialsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Internal Notes</Label>
+                <Label>Internal Notes (Optional)</Label>
                 <Textarea placeholder="Details for craftsmen..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-[80px]" />
               </div>
 
@@ -260,14 +264,20 @@ export default function MaterialsPage() {
         ) : (
           filteredMaterials.map((material: any) => (
             <Card key={material.id} className="border-none shadow-sm hover:shadow-lg transition-all overflow-hidden bg-white rounded-3xl group">
-              <div className="relative aspect-video overflow-hidden">
+              <div 
+                className="relative aspect-video overflow-hidden cursor-zoom-in"
+                onClick={() => setViewingImage(material.imageUrls?.[0] || "https://picsum.photos/seed/mat/800/600")}
+              >
                 <Image 
                   src={material.imageUrls?.[0] || "https://picsum.photos/seed/mat/800/600"} 
                   alt={material.name} 
                   fill 
                   className="object-cover transition-transform group-hover:scale-105 duration-500" 
                 />
-                <div className="absolute top-2 right-2 flex gap-1">
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                  <Maximize2 className="text-white opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 drop-shadow-md" />
+                </div>
+                <div className="absolute top-2 right-2 flex gap-1 z-10">
                   <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/80 backdrop-blur rounded-lg">
                     <Edit2 className="h-3.5 w-3.5" />
                   </Button>
@@ -275,7 +285,7 @@ export default function MaterialsPage() {
                     variant="destructive" 
                     size="icon" 
                     className="h-8 w-8 bg-red-500/80 backdrop-blur rounded-lg"
-                    onClick={() => { setDeleteId(material.id); setIsDeleteDialogOpen(true); }}
+                    onClick={(e) => { e.stopPropagation(); setDeleteId(material.id); setIsDeleteDialogOpen(true); }}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -308,6 +318,23 @@ export default function MaterialsPage() {
           ))
         )}
       </div>
+
+      {/* Image Viewer Dialog */}
+      <Dialog open={!!viewingImage} onOpenChange={(open) => !open && setViewingImage(null)}>
+        <DialogContent className="max-w-[90vw] w-full h-[80vh] p-0 bg-black/95 border-none rounded-none overflow-hidden flex flex-col items-center justify-center">
+          <DialogTitle className="sr-only">Material Image Preview</DialogTitle>
+          <div className="relative w-full h-full p-4 flex items-center justify-center">
+            {viewingImage && (
+              <Image 
+                src={viewingImage} 
+                alt="Material Preview" 
+                fill 
+                className="object-contain" 
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent className="rounded-2xl">
