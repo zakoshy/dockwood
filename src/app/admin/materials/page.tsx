@@ -46,6 +46,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function MaterialsPage() {
   const db = useFirestore();
@@ -112,9 +113,9 @@ export default function MaterialsPage() {
         name,
         type,
         quantity,
-        description: description || "", // Optional
-        warehouseId: warehouseId || "unassigned", // Optional
-        warehouseLocation: warehouseLocation || "General Stock", // Optional
+        description: description || "", 
+        warehouseId: warehouseId || "unassigned", 
+        warehouseLocation: warehouseLocation || "General Stock", 
         imageUrls: imagePreviews.length > 0 ? imagePreviews : ["https://picsum.photos/seed/material/800/600"],
         createdAt: serverTimestamp(),
       });
@@ -162,81 +163,97 @@ export default function MaterialsPage() {
               <Plus className="mr-2 h-5 w-5" /> Log New Material
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[550px] rounded-2xl">
-            <DialogHeader>
+          <DialogContent className="sm:max-w-[550px] max-h-[90vh] flex flex-col p-0 rounded-2xl overflow-hidden">
+            <DialogHeader className="p-6 pb-2">
               <DialogTitle className="text-2xl font-headline font-bold text-primary">Add Internal Material</DialogTitle>
               <DialogDescription>Input details for production supplies.</DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleCreateMaterial} className="space-y-4 py-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Material Name</Label>
-                  <Input required placeholder="e.g. Mahogany Planks" value={name} onChange={(e) => setName(e.target.value)} />
+            
+            <ScrollArea className="flex-1 px-6">
+              <form id="material-form" onSubmit={handleCreateMaterial} className="space-y-6 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Material Name</Label>
+                    <Input required placeholder="e.g. Mahogany Planks" value={name} onChange={(e) => setName(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Material Type</Label>
+                    <Select onValueChange={setType} required>
+                      <SelectTrigger><SelectValue placeholder="Select Type" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Timber">Timber / Wood</SelectItem>
+                        <SelectItem value="Fabric">Fabric / Leather</SelectItem>
+                        <SelectItem value="Hardware">Hardware / Fittings</SelectItem>
+                        <SelectItem value="Finishing">Varnish / Paint</SelectItem>
+                        <SelectItem value="Tools">Tools</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Material Type</Label>
-                  <Select onValueChange={setType} required>
-                    <SelectTrigger><SelectValue placeholder="Select Type" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Timber">Timber / Wood</SelectItem>
-                      <SelectItem value="Fabric">Fabric / Leather</SelectItem>
-                      <SelectItem value="Hardware">Hardware / Fittings</SelectItem>
-                      <SelectItem value="Finishing">Varnish / Paint</SelectItem>
-                      <SelectItem value="Tools">Tools</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Quantity / Stock</Label>
+                    <Input required placeholder="e.g. 50 pcs, 10 rolls" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Stall Location (Optional)</Label>
+                    <Select onValueChange={(val) => {
+                      setWarehouseId(val);
+                      setWarehouseLocation(warehouses?.find((w: any) => w.id === val)?.name || "");
+                    }}>
+                      <SelectTrigger><SelectValue placeholder="Select Stall" /></SelectTrigger>
+                      <SelectContent>
+                        {warehouses?.map((w: any) => (
+                          <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label>Quantity / Stock</Label>
-                  <Input required placeholder="e.g. 50 pcs, 10 rolls" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                  <Label>Internal Notes (Optional)</Label>
+                  <Textarea placeholder="Details for craftsmen..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-[100px]" />
                 </div>
+
                 <div className="space-y-2">
-                  <Label>Stall Location (Optional)</Label>
-                  <Select onValueChange={(val) => {
-                    setWarehouseId(val);
-                    setWarehouseLocation(warehouses?.find((w: any) => w.id === val)?.name || "");
-                  }}>
-                    <SelectTrigger><SelectValue placeholder="Select Stall" /></SelectTrigger>
-                    <SelectContent>
-                      {warehouses?.map((w: any) => (
-                        <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label>Reference Photos</Label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {imagePreviews.map((p, i) => (
+                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden border">
+                        <Image src={p} alt="Preview" fill className="object-cover" />
+                        <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 bg-red-500 text-white p-0.5 rounded-full"><X className="h-3 w-3" /></button>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:bg-slate-50">
+                      <ImageIcon className="h-5 w-5" />
+                      <span className="text-[10px] font-bold">ADD</span>
+                    </button>
+                  </div>
+                  <input type="file" ref={fileInputRef} hidden multiple accept="image/*" onChange={handleImageSelect} />
                 </div>
-              </div>
+              </form>
+            </ScrollArea>
 
-              <div className="space-y-2">
-                <Label>Internal Notes (Optional)</Label>
-                <Textarea placeholder="Details for craftsmen..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-[80px]" />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Reference Photos</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {imagePreviews.map((p, i) => (
-                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden border">
-                      <Image src={p} alt="Preview" fill className="object-cover" />
-                      <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 bg-red-500 text-white p-0.5 rounded-full"><X className="h-3 w-3" /></button>
-                    </div>
-                  ))}
-                  <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:bg-slate-50">
-                    <ImageIcon className="h-5 w-5" />
-                    <span className="text-[10px] font-bold">ADD</span>
-                  </button>
-                </div>
-                <input type="file" ref={fileInputRef} hidden multiple accept="image/*" onChange={handleImageSelect} />
-              </div>
-
-              <DialogFooter className="pt-4">
-                <Button type="submit" className="w-full bg-primary h-12 rounded-xl font-bold" disabled={isSubmitting}>
-                  {isSubmitting ? <Loader2 className="animate-spin" /> : "Save to Library"}
-                </Button>
-              </DialogFooter>
-            </form>
+            <DialogFooter className="p-6 pt-2 border-t flex flex-row gap-2">
+              <Button 
+                variant="outline" 
+                type="button" 
+                className="flex-1 rounded-xl h-12"
+                onClick={() => setIsDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                form="material-form"
+                type="submit" 
+                className="flex-[2] bg-primary h-12 rounded-xl font-bold" 
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <Loader2 className="animate-spin" /> : "Save to Library"}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
