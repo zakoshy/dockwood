@@ -46,7 +46,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function MaterialsPage() {
   const db = useFirestore();
@@ -163,23 +162,23 @@ export default function MaterialsPage() {
               <Plus className="mr-2 h-5 w-5" /> Log New Material
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[550px] max-h-[90vh] flex flex-col p-0 rounded-2xl overflow-hidden">
-            <DialogHeader className="p-6 pb-2">
+          <DialogContent className="sm:max-w-[550px] max-h-[85vh] h-[85vh] flex flex-col p-0 rounded-2xl overflow-hidden">
+            <DialogHeader className="p-6 pb-2 shrink-0 border-b">
               <DialogTitle className="text-2xl font-headline font-bold text-primary">Add Internal Material</DialogTitle>
               <DialogDescription>Input details for production supplies.</DialogDescription>
             </DialogHeader>
             
-            <ScrollArea className="flex-1 px-6">
-              <form id="material-form" onSubmit={handleCreateMaterial} className="space-y-6 py-4">
+            <div className="flex-1 overflow-y-auto p-6">
+              <form id="material-form" onSubmit={handleCreateMaterial} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Material Name</Label>
-                    <Input required placeholder="e.g. Mahogany Planks" value={name} onChange={(e) => setName(e.target.value)} />
+                    <Label htmlFor="mat-name">Material Name</Label>
+                    <Input id="mat-name" required placeholder="e.g. Mahogany Planks" value={name} onChange={(e) => setName(e.target.value)} className="h-11" />
                   </div>
                   <div className="space-y-2">
-                    <Label>Material Type</Label>
+                    <Label htmlFor="mat-type">Material Type</Label>
                     <Select onValueChange={setType} required>
-                      <SelectTrigger><SelectValue placeholder="Select Type" /></SelectTrigger>
+                      <SelectTrigger id="mat-type" className="h-11"><SelectValue placeholder="Select Type" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Timber">Timber / Wood</SelectItem>
                         <SelectItem value="Fabric">Fabric / Leather</SelectItem>
@@ -193,16 +192,16 @@ export default function MaterialsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Quantity / Stock</Label>
-                    <Input required placeholder="e.g. 50 pcs, 10 rolls" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+                    <Label htmlFor="mat-qty">Quantity / Stock</Label>
+                    <Input id="mat-qty" required placeholder="e.g. 50 pcs, 10 rolls" value={quantity} onChange={(e) => setQuantity(e.target.value)} className="h-11" />
                   </div>
                   <div className="space-y-2">
-                    <Label>Stall Location (Optional)</Label>
+                    <Label htmlFor="mat-stall">Stall Location (Optional)</Label>
                     <Select onValueChange={(val) => {
                       setWarehouseId(val);
                       setWarehouseLocation(warehouses?.find((w: any) => w.id === val)?.name || "");
                     }}>
-                      <SelectTrigger><SelectValue placeholder="Select Stall" /></SelectTrigger>
+                      <SelectTrigger id="mat-stall" className="h-11"><SelectValue placeholder="Select Stall" /></SelectTrigger>
                       <SelectContent>
                         {warehouses?.map((w: any) => (
                           <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>
@@ -213,13 +212,13 @@ export default function MaterialsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Internal Notes (Optional)</Label>
-                  <Textarea placeholder="Details for craftsmen..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-[100px]" />
+                  <Label htmlFor="mat-notes">Internal Notes (Optional)</Label>
+                  <Textarea id="mat-notes" placeholder="Details for craftsmen..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-[100px] rounded-xl" />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3 pb-4">
                   <Label>Reference Photos</Label>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {imagePreviews.map((p, i) => (
                       <div key={i} className="relative aspect-square rounded-lg overflow-hidden border group">
                         <Image src={p} alt="Preview" fill className="object-cover" />
@@ -235,9 +234,9 @@ export default function MaterialsPage() {
                     <button 
                       type="button" 
                       onClick={() => fileInputRef.current?.click()} 
-                      className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:bg-slate-50 transition-colors"
+                      className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:bg-slate-50 transition-colors bg-slate-50/50"
                     >
-                      <ImageIcon className="h-5 w-5" />
+                      <ImageIcon className="h-5 w-5 mb-1" />
                       <span className="text-[10px] font-bold">ADD PHOTO</span>
                     </button>
                   </div>
@@ -251,9 +250,9 @@ export default function MaterialsPage() {
                   />
                 </div>
               </form>
-            </ScrollArea>
+            </div>
 
-            <DialogFooter className="p-6 pt-2 border-t flex flex-row gap-2">
+            <DialogFooter className="p-4 border-t shrink-0 flex flex-row gap-2 bg-slate-50/50">
               <Button 
                 variant="outline" 
                 type="button" 
@@ -268,7 +267,8 @@ export default function MaterialsPage() {
                 className="flex-[2] bg-primary h-12 rounded-xl font-bold" 
                 disabled={isSubmitting}
               >
-                {isSubmitting ? <Loader2 className="animate-spin" /> : "Save to Library"}
+                {isSubmitting ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
+                {isSubmitting ? "Saving..." : "Save to Library"}
               </Button>
             </DialogFooter>
           </DialogContent>
