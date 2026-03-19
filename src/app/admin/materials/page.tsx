@@ -221,17 +221,34 @@ export default function MaterialsPage() {
                   <Label>Reference Photos</Label>
                   <div className="grid grid-cols-4 gap-2">
                     {imagePreviews.map((p, i) => (
-                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden border">
+                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden border group">
                         <Image src={p} alt="Preview" fill className="object-cover" />
-                        <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 bg-red-500 text-white p-0.5 rounded-full"><X className="h-3 w-3" /></button>
+                        <button 
+                          type="button" 
+                          onClick={() => removeImage(i)} 
+                          className="absolute top-1 right-1 bg-red-500 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
                       </div>
                     ))}
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:bg-slate-50">
+                    <button 
+                      type="button" 
+                      onClick={() => fileInputRef.current?.click()} 
+                      className="aspect-square border-2 border-dashed rounded-lg flex flex-col items-center justify-center text-muted-foreground hover:bg-slate-50 transition-colors"
+                    >
                       <ImageIcon className="h-5 w-5" />
-                      <span className="text-[10px] font-bold">ADD</span>
+                      <span className="text-[10px] font-bold">ADD PHOTO</span>
                     </button>
                   </div>
-                  <input type="file" ref={fileInputRef} hidden multiple accept="image/*" onChange={handleImageSelect} />
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    hidden 
+                    multiple 
+                    accept="image/*" 
+                    onChange={handleImageSelect} 
+                  />
                 </div>
               </form>
             </ScrollArea>
