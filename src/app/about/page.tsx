@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import Image from "next/image";
@@ -23,11 +22,10 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl">
                 <Image 
-                  src="https://picsum.photos/seed/dockwood-about/800/1000" 
-                  alt="Craftsman at work" 
+                  src="/seats.jpg" 
+                  alt="Dockwood Furnitures Craftsmanship" 
                   fill 
                   className="object-cover"
-                  data-ai-hint="carpenter workshop"
                 />
               </div>
               <div>
