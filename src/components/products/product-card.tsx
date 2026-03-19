@@ -4,7 +4,7 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Box, ChevronLeft, ChevronRight } from "lucide-react";
+import { MessageCircle, Box, Maximize2, X } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import {
   Carousel,
@@ -13,8 +13,15 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useFirestore } from "@/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useState } from "react";
 
 interface ProductCardProps {
   id: string;
@@ -27,6 +34,7 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl }: ProductCardProps) {
   const db = useFirestore();
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   const displayImages = imageUrls && imageUrls.length > 0 ? imageUrls : [imageUrl || `https://picsum.photos/seed/${id}/600/450`];
 
   const handleInquiry = async () => {
@@ -48,54 +56,76 @@ export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl 
   const isLowStock = quantity > 0 && quantity < 5;
   const isOutOfStock = quantity === 0;
 
+  const ImageContent = ({ inModal = false }: { inModal?: boolean }) => (
+    <>
+      {displayImages.length > 1 ? (
+        <Carousel className="w-full h-full">
+          <CarouselContent className={inModal ? "h-[70vh]" : "h-full ml-0"}>
+            {displayImages.map((url, index) => (
+              <CarouselItem key={index} className="h-full pl-0 relative">
+                <div className="relative w-full h-full">
+                  <Image
+                    src={url}
+                    alt={`${name} - ${index + 1}`}
+                    fill
+                    className={inModal ? "object-contain" : "object-cover"}
+                    data-ai-hint="wooden furniture"
+                  />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="left-4 bg-white/80 border-none h-10 w-10" />
+          <CarouselNext className="right-4 bg-white/80 border-none h-10 w-10" />
+        </Carousel>
+      ) : (
+        <div className="h-full w-full relative">
+          <Image
+            src={displayImages[0]}
+            alt={name}
+            fill
+            className={inModal ? "object-contain" : "object-cover transition-transform group-hover:scale-105 duration-500"}
+            data-ai-hint="wooden furniture"
+          />
+        </div>
+      )}
+    </>
+  );
+
   return (
     <Card className="overflow-hidden group hover:shadow-xl transition-all border-none shadow-sm bg-white flex flex-col h-full">
-      <div className="relative aspect-[4/3] overflow-hidden">
-        {displayImages.length > 1 ? (
-          <Carousel className="w-full h-full">
-            <CarouselContent className="h-full ml-0">
-              {displayImages.map((url, index) => (
-                <CarouselItem key={index} className="h-full pl-0 relative">
-                  <div className="h-[250px] relative">
-                    <Image
-                      src={url}
-                      alt={`${name} - ${index + 1}`}
-                      fill
-                      className="object-cover"
-                      data-ai-hint="wooden furniture"
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/70 border-none h-8 w-8" />
-            <CarouselNext className="right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/70 border-none h-8 w-8" />
-          </Carousel>
-        ) : (
-          <div className="h-full w-full relative">
-            <Image
-              src={displayImages[0]}
-              alt={name}
-              fill
-              className="object-cover transition-transform group-hover:scale-110 duration-500"
-              data-ai-hint="wooden furniture"
-            />
+      <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
+        <div className="relative aspect-[4/3] overflow-hidden cursor-zoom-in">
+          <DialogTrigger asChild>
+            <div className="w-full h-full">
+              <ImageContent />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                <Maximize2 className="text-white opacity-0 group-hover:opacity-100 transition-opacity h-10 w-10 drop-shadow-lg" />
+              </div>
+            </div>
+          </DialogTrigger>
+          
+          <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
+            <Badge variant="secondary" className="bg-white/90 text-primary border-none font-semibold shadow-sm">
+              {category}
+            </Badge>
+            {isOutOfStock ? (
+              <Badge variant="destructive" className="font-bold shadow-sm">Out of Stock</Badge>
+            ) : isLowStock ? (
+              <Badge className="bg-accent text-white border-none font-bold shadow-sm">Limited: {quantity} left</Badge>
+            ) : (
+              <Badge className="bg-green-600 text-white border-none font-bold shadow-sm">Available: {quantity}</Badge>
+            )}
           </div>
-        )}
-        
-        <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
-          <Badge variant="secondary" className="bg-white/90 text-primary border-none font-semibold shadow-sm">
-            {category}
-          </Badge>
-          {isOutOfStock ? (
-            <Badge variant="destructive" className="font-bold shadow-sm">Out of Stock</Badge>
-          ) : isLowStock ? (
-            <Badge className="bg-accent text-white border-none font-bold shadow-sm">Limited: {quantity} left</Badge>
-          ) : (
-            <Badge className="bg-green-600 text-white border-none font-bold shadow-sm">Available: {quantity}</Badge>
-          )}
         </div>
-      </div>
+
+        <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 bg-black/95 border-none rounded-none sm:rounded-none overflow-hidden flex flex-col items-center justify-center">
+          <DialogTitle className="sr-only">Product Image Viewer: {name}</DialogTitle>
+          <div className="relative w-full h-full p-4 md:p-12">
+            <ImageContent inModal />
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <CardHeader className="p-4 pb-0">
         <h3 className="text-lg font-headline font-bold text-primary group-hover:text-accent transition-colors line-clamp-1">
