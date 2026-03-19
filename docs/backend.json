@@ -33,6 +33,25 @@
       },
       "required": ["name", "category", "stock"]
     },
+    "Material": {
+      "title": "Material",
+      "description": "Internal raw materials used for production (timber, fabric, etc.).",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "description": "e.g., Timber, Hardware, Fabric" },
+        "description": { "type": "string" },
+        "quantity": { "type": "string" },
+        "warehouseId": { "type": "string" },
+        "warehouseLocation": { "type": "string" },
+        "imageUrls": { 
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "type"]
+    },
     "Sale": {
       "title": "Sale",
       "description": "A recorded transaction of a product sale.",
@@ -88,6 +107,10 @@
     "/products/{productId}": {
       "schema": "Product",
       "description": "Collection of all products in the catalog."
+    },
+    "/materials/{materialId}": {
+      "schema": "Material",
+      "description": "Internal production materials library."
     },
     "/sales/{saleId}": {
       "schema": "Sale",

@@ -14,7 +14,8 @@ import {
   Menu,
   Loader2,
   BarChart2,
-  Warehouse
+  Warehouse,
+  Construction
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart2 },
     { name: "Warehouses", href: "/admin/warehouses", icon: Warehouse },
+    { name: "Materials Library", href: "/admin/materials", icon: Construction },
     { name: "Inventory", href: "/admin/products", icon: Package },
     { name: "Sales", href: "/admin/sales", icon: ShoppingCart },
     { name: "Deliveries", href: "/admin/deliveries", icon: Truck },
