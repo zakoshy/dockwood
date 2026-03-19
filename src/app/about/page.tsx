@@ -18,20 +18,12 @@ export default function AboutPage() {
         </section>
 
         <section className="py-20">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl">
-                <Image 
-                  src="/seats.jpg" 
-                  alt="Dockwood Furnitures Craftsmanship" 
-                  fill 
-                  className="object-cover"
-                />
-              </div>
-              <div>
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="flex flex-col gap-16 items-center">
+              <div className="text-center">
                 <Badge className="bg-accent mb-4">Our Mission</Badge>
-                <h2 className="text-4xl font-headline font-bold text-primary mb-6">Built on Quality & Integrity</h2>
-                <div className="space-y-6 text-muted-foreground text-lg leading-relaxed">
+                <h2 className="text-4xl font-headline font-bold text-primary mb-8">Built on Quality & Integrity</h2>
+                <div className="space-y-6 text-muted-foreground text-lg leading-relaxed max-w-3xl mx-auto">
                   <p>
                     Dockwood Furnitures started as a small timber yard in Bombolulu with a simple vision: to provide high-quality wood and furniture that stands the test of time. 
                     Today, we serve hundreds of clients across Mombasa, from individual homeowners to large construction firms.
@@ -43,6 +35,15 @@ export default function AboutPage() {
                     Our commitment to same-day delivery and customer satisfaction has made us the go-to shop for furniture in Kisimani and beyond. Whether you need a simple chair or a full suite of beds for a new hotel, we deliver with the same excellence.
                   </p>
                 </div>
+              </div>
+              
+              <div className="relative w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
+                <Image 
+                  src="/table.jpg" 
+                  alt="Dockwood Furnitures Craftsmanship" 
+                  fill 
+                  className="object-cover"
+                />
               </div>
             </div>
           </div>
