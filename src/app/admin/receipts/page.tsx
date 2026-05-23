@@ -143,10 +143,7 @@ export default function ReceiptGenerator() {
 
   const handlePrint = () => {
     if (typeof window !== "undefined") {
-      // Small delay helps browser handle print rendering while UI settles
-      setTimeout(() => {
-        window.print();
-      }, 100);
+      window.print();
     }
   };
 
@@ -303,7 +300,7 @@ export default function ReceiptGenerator() {
           <p className="text-muted-foreground font-medium">Standard Kenyan Tax Format (eTIMS Placeholder Support)</p>
         </div>
         <div className="bg-white p-1 rounded-xl shadow-sm border flex">
-           <Button type="button" variant="ghost" className="rounded-lg h-9 px-4 text-xs font-black bg-accent text-white hover:bg-accent hover:text-white">NEW RECEIPT</Button>
+           <Button type="button" variant="ghost" className="rounded-lg h-9 px-4 text-xs font-black bg-accent text-white hover:bg-accent hover:text-white" onClick={resetForm}>NEW RECEIPT</Button>
            <Button type="button" variant="ghost" className="rounded-lg h-9 px-4 text-xs font-bold text-muted-foreground hover:bg-slate-50">HISTORY</Button>
         </div>
       </div>

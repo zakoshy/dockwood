@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import Image from "next/image";
@@ -39,7 +40,7 @@ export default function AboutPage() {
               
               <div className="relative w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl border-8 border-white">
                 <Image 
-                  src="/table.jpg" 
+                  src="/bed.jpg" 
                   alt="Dockwood Furnitures Craftsmanship" 
                   fill 
                   className="object-cover"

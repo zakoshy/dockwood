@@ -239,7 +239,7 @@ export default function AdminSales() {
               <span className="text-sm text-muted-foreground font-medium">Historical Records</span>
             </div>
           </div>
-        </header>
+        </CardHeader>
         <CardContent className="p-0">
           <div className="relative overflow-x-auto">
             {salesLoading ? (
