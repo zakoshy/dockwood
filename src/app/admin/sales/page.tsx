@@ -1,8 +1,7 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar, Search, Download, TrendingUp, Plus, User, Package, CreditCard, Loader2 } from "lucide-react";
@@ -29,15 +28,19 @@ export default function AdminSales() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Guarded queries for sales history
-  const salesQuery = useMemo(() => (db && user ? query(collection(db, "sales"), orderBy("timestamp", "desc")) : null), [db, user]);
-  // Products are public read, but still better to wait for user in admin context
-  const productsQuery = useMemo(() => (db && user ? collection(db, "products") : null), [db, user]);
+  const salesQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(collection(db, "sales"), orderBy("timestamp", "desc"));
+  }, [db, user]);
+
+  const productsQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return collection(db, "products");
+  }, [db, user]);
 
   const { data: sales, loading: salesLoading } = useCollection(salesQuery);
   const { data: products } = useCollection(productsQuery);
 
-  // Form State
   const [customer, setCustomer] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [qty, setQty] = useState("1");
@@ -79,7 +82,6 @@ export default function AdminSales() {
         description: `Successfully recorded sale for ${customer}.`,
       });
       
-      // Reset form
       setCustomer("");
       setSelectedProduct("");
       setQty("1");
@@ -222,7 +224,7 @@ export default function AdminSales() {
         </Card>
       </div>
 
-      <Card className="border-none shadow-sm overflow-hidden">
+      <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardHeader className="p-6 border-b bg-white">
           <div className="flex flex-col md:flex-row justify-between gap-4">
             <div className="relative w-full md:w-96">

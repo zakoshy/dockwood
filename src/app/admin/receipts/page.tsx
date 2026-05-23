@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useMemo } from "react";
@@ -54,11 +53,9 @@ export default function ReceiptGenerator() {
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Deletion State
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Receipt Form State
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerPin, setCustomerPin] = useState("");
@@ -66,10 +63,8 @@ export default function ReceiptGenerator() {
   const [items, setItems] = useState<ReceiptItem[]>([{ description: "", quantity: 1, unitPrice: 0, total: 0 }]);
   const [receiptNumber, setReceiptNumber] = useState(`DW-${Math.floor(100000 + Math.random() * 900000)}`);
   
-  // Dockwood Details
   const companyPin = "P051234567A"; 
 
-  // History State
   const receiptsQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(collection(db, "receipts"), orderBy("createdAt", "desc"));
@@ -189,7 +184,6 @@ export default function ReceiptGenerator() {
           </div>
         </div>
 
-        {/* PRINTABLE AREA */}
         <div id="printable-receipt" className="bg-white p-12 shadow-xl border rounded-none min-h-[842px] print:shadow-none print:border-none print:p-0">
           <div className="flex justify-between items-start mb-10 border-b-4 border-primary pb-8">
             <div className="space-y-2">
@@ -306,7 +300,6 @@ export default function ReceiptGenerator() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* FORM SIDE */}
         <div className="lg:col-span-2 space-y-6">
           <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardHeader className="bg-slate-50/50 pb-6 border-b">
@@ -441,7 +434,6 @@ export default function ReceiptGenerator() {
           </Card>
         </div>
 
-        {/* SUMMARY SIDE */}
         <div className="space-y-6">
           <Card className="border-none shadow-xl bg-primary text-white rounded-3xl overflow-hidden relative">
             <div className="absolute top-0 right-0 p-8 opacity-10">
