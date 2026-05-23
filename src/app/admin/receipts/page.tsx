@@ -23,9 +23,19 @@ import {
   ShieldCheck,
   Hash
 } from "lucide-react";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useCollection, useFirestore, useUser } from "@/firebase";
-import { collection, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -43,6 +53,10 @@ export default function ReceiptGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Deletion State
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Receipt Form State
   const [customerName, setCustomerName] = useState("");
@@ -129,7 +143,23 @@ export default function ReceiptGenerator() {
 
   const handlePrint = () => {
     if (typeof window !== "undefined") {
-      window.print();
+      // Small delay helps browser handle print rendering while UI settles
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    }
+  };
+
+  const handleDeleteReceipt = async () => {
+    if (!db || !deleteId) return;
+    try {
+      await deleteDoc(doc(db, "receipts", deleteId));
+      toast({ title: "Receipt Removed", description: "Record has been deleted from history." });
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Error", description: "Could not delete record." });
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setDeleteId(null);
     }
   };
 
@@ -490,6 +520,18 @@ export default function ReceiptGenerator() {
                        </div>
                        <div className="text-right flex items-center gap-3">
                           <div className="text-sm font-black text-primary">K {rec.totalAmount?.toLocaleString()}</div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 text-slate-300 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteId(rec.id);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                           <ChevronRight className="h-4 w-4 text-slate-200 group-hover:text-accent transition-colors" />
                        </div>
                     </div>
@@ -501,6 +543,26 @@ export default function ReceiptGenerator() {
           </Card>
         </div>
       </div>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-headline font-bold text-primary text-xl">Delete Receipt Record</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this receipt from history? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleDeleteReceipt}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold"
+            >
+              Delete Permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
