@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Warehouse, Plus, Search, Loader2, ChevronRight, MapPin, Package, Trash2, Edit2 } from "lucide-react";
 import Link from "next/link";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -35,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function WarehousesPage() {
   const db = useFirestore();
+  const { user } = useUser();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -54,13 +55,12 @@ export default function WarehousesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  const { data: warehouses, loading } = useCollection(
-    useMemo(() => (db ? query(collection(db, "warehouses"), orderBy("name", "asc")) : null), [db])
-  );
+  // Guarded queries
+  const warehousesQuery = useMemo(() => (db && user ? query(collection(db, "warehouses"), orderBy("name", "asc")) : null), [db, user]);
+  const productsQuery = useMemo(() => (db && user ? collection(db, "products") : null), [db, user]);
 
-  const { data: allProducts } = useCollection(
-    useMemo(() => (db ? collection(db, "products") : null), [db])
-  );
+  const { data: warehouses, loading } = useCollection(warehousesQuery);
+  const { data: allProducts } = useCollection(productsQuery);
 
   const filteredWarehouses = useMemo(() => {
     if (!warehouses) return [];

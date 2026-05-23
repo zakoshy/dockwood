@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ import {
   Hash
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 import { collection, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -39,6 +39,7 @@ interface ReceiptItem {
 export default function ReceiptGenerator() {
   const { toast } = useToast();
   const db = useFirestore();
+  const { user } = useUser();
   const [isGenerating, setIsGenerating] = useState(false);
   const [showPrintPreview, setShowPrintPreview] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,10 +55,13 @@ export default function ReceiptGenerator() {
   // Dockwood Details (Fixed)
   const companyPin = "P051234567A"; 
 
-  // History State
-  const { data: receipts, loading: receiptsLoading } = useCollection(
-    useMemo(() => (db ? query(collection(db, "receipts"), orderBy("createdAt", "desc")) : null), [db])
-  );
+  // History State - Guarded by user auth
+  const receiptsQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(collection(db, "receipts"), orderBy("createdAt", "desc"));
+  }, [db, user]);
+
+  const { data: receipts, loading: receiptsLoading } = useCollection(receiptsQuery);
 
   const filteredReceipts = useMemo(() => {
     if (!receipts) return [];
@@ -433,6 +437,10 @@ export default function ReceiptGenerator() {
                  <div className="flex justify-between text-[10px] font-black uppercase tracking-widest pt-2">
                     <span className="opacity-50">Customer</span>
                     <span className="truncate max-w-[120px]">{customerName || 'N/A'}</span>
+                 </div>
+                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                    <span className="opacity-50">Method</span>
+                    <Badge className="bg-white/10 text-white font-black border-none py-0 h-5">{paymentMethod}</Badge>
                  </div>
               </div>
 

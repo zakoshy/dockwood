@@ -21,7 +21,7 @@ import {
   Maximize2
 } from "lucide-react";
 import Image from "next/image";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -49,6 +49,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function MaterialsPage() {
   const db = useFirestore();
+  const { user } = useUser();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,13 +72,12 @@ export default function MaterialsPage() {
   // Viewer State
   const [viewingImage, setViewingImage] = useState<string | null>(null);
 
-  const { data: materials, loading } = useCollection(
-    useMemo(() => (db ? query(collection(db, "materials"), orderBy("createdAt", "desc")) : null), [db])
-  );
+  // Guarded queries
+  const materialsQuery = useMemo(() => (db && user ? query(collection(db, "materials"), orderBy("createdAt", "desc")) : null), [db, user]);
+  const warehousesQuery = useMemo(() => (db && user ? query(collection(db, "warehouses"), orderBy("name", "asc")) : null), [db, user]);
 
-  const { data: warehouses } = useCollection(
-    useMemo(() => (db ? query(collection(db, "warehouses"), orderBy("name", "asc")) : null), [db])
-  );
+  const { data: materials, loading } = useCollection(materialsQuery);
+  const { data: warehouses } = useCollection(warehousesQuery);
 
   const filteredMaterials = useMemo(() => {
     if (!materials) return [];

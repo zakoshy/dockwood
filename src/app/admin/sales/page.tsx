@@ -18,23 +18,24 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 import { collection, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
 
 export default function AdminSales() {
   const { toast } = useToast();
   const db = useFirestore();
+  const { user } = useUser();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch Sales and Products
-  const { data: sales, loading: salesLoading } = useCollection(
-    useMemo(() => (db ? query(collection(db, "sales"), orderBy("timestamp", "desc")) : null), [db])
-  );
-  const { data: products } = useCollection(
-    useMemo(() => (db ? collection(db, "products") : null), [db])
-  );
+  // Guarded queries for sales history
+  const salesQuery = useMemo(() => (db && user ? query(collection(db, "sales"), orderBy("timestamp", "desc")) : null), [db, user]);
+  // Products are public read, but still better to wait for user in admin context
+  const productsQuery = useMemo(() => (db && user ? collection(db, "products") : null), [db, user]);
+
+  const { data: sales, loading: salesLoading } = useCollection(salesQuery);
+  const { data: products } = useCollection(productsQuery);
 
   // Form State
   const [customer, setCustomer] = useState("");
@@ -238,7 +239,7 @@ export default function AdminSales() {
               <span className="text-sm text-muted-foreground font-medium">Historical Records</span>
             </div>
           </div>
-        </CardHeader>
+        </header>
         <CardContent className="p-0">
           <div className="relative overflow-x-auto">
             {salesLoading ? (

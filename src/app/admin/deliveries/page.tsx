@@ -31,22 +31,26 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
 
 export default function AdminDeliveries() {
   const { toast } = useToast();
   const db = useFirestore();
+  const { user } = useUser();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Fetch Deliveries
-  const { data: deliveries, loading } = useCollection(
-    useMemo(() => (db ? query(collection(db, "deliveries"), orderBy("timestamp", "desc")) : null), [db])
-  );
+  // Fetch Deliveries - Guarded by user auth
+  const deliveriesQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(collection(db, "deliveries"), orderBy("timestamp", "desc"));
+  }, [db, user]);
+
+  const { data: deliveries, loading } = useCollection(deliveriesQuery);
 
   // Form State
   const [customer, setCustomer] = useState("");
