@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from "react";
@@ -27,16 +26,23 @@ import {
   Line,
   CartesianGrid
 } from "recharts";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 import { collection, query, orderBy, limit } from "firebase/firestore";
 
 export default function AdminAnalytics() {
   const db = useFirestore();
+  const { user } = useUser();
 
-  // Fetch interaction data
-  const { data: interactions, loading } = useCollection(
-    useMemo(() => (db ? query(collection(db, "interactions"), orderBy("timestamp", "desc"), limit(500)) : null), [db])
-  );
+  const interactionsQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(
+      collection(db, "interactions"), 
+      orderBy("timestamp", "desc"), 
+      limit(500)
+    );
+  }, [db, user]);
+
+  const { data: interactions, loading } = useCollection(interactionsQuery);
 
   const stats = useMemo(() => {
     if (!interactions) return { visits: 0, inquiries: 0, views: 0 };
@@ -51,7 +57,6 @@ export default function AdminAnalytics() {
   const chartData = useMemo(() => {
     if (!interactions || interactions.length === 0) return [];
 
-    // Group visits by day
     const days: { [key: string]: number } = {};
     const last7Days = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();

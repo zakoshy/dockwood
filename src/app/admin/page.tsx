@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from "react";
@@ -34,35 +33,28 @@ import {
   Tooltip,
   Cell
 } from "recharts";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useUser } from "@/firebase";
 import { collection, query, orderBy, limit } from "firebase/firestore";
 
 export default function AdminDashboard() {
   const db = useFirestore();
+  const { user } = useUser();
 
-  // Fetch all data for stats
-  const { data: products, loading: productsLoading } = useCollection(
-    useMemo(() => (db ? collection(db, "products") : null), [db])
-  );
-  const { data: sales, loading: salesLoading } = useCollection(
-    useMemo(() => (db ? collection(db, "sales") : null), [db])
-  );
-  const { data: deliveries, loading: deliveriesLoading } = useCollection(
-    useMemo(() => (db ? collection(db, "deliveries") : null), [db])
-  );
-  const { data: warehouses, loading: warehousesLoading } = useCollection(
-    useMemo(() => (db ? collection(db, "warehouses") : null), [db])
-  );
+  // Fetch all data for stats, protected by user check
+  const productsQuery = useMemo(() => (db && user ? collection(db, "products") : null), [db, user]);
+  const salesQuery = useMemo(() => (db && user ? collection(db, "sales") : null), [db, user]);
+  const deliveriesQuery = useMemo(() => (db && user ? collection(db, "deliveries") : null), [db, user]);
+  const warehousesQuery = useMemo(() => (db && user ? collection(db, "warehouses") : null), [db, user]);
+
+  const { data: products, loading: productsLoading } = useCollection(productsQuery);
+  const { data: sales, loading: salesLoading } = useCollection(salesQuery);
+  const { data: deliveries, loading: deliveriesLoading } = useCollection(deliveriesQuery);
+  const { data: warehouses, loading: warehousesLoading } = useCollection(warehousesQuery);
 
   const stats = useMemo(() => {
     const revenue = sales?.reduce((acc, sale: any) => acc + (Number(sale.totalAmount) || 0), 0) || 0;
     const activeDeliveries = deliveries?.filter((d: any) => d.status !== 'Delivered' && d.status !== 'Cancelled').length || 0;
     const lowStockCount = products?.filter((p: any) => (p.stock || 0) < 5).length || 0;
-    const todayDeliveries = deliveries?.filter((d: any) => {
-      if (!d.timestamp) return false;
-      const date = d.timestamp.toDate ? d.timestamp.toDate() : new Date(d.timestamp);
-      return date.toDateString() === new Date().toDateString();
-    }).length || 0;
 
     return [
       { 
@@ -147,12 +139,7 @@ export default function AdminDashboard() {
   if (productsLoading || salesLoading || deliveriesLoading || warehousesLoading) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6">
-        <div className="relative">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-4 w-4 bg-accent rounded-full animate-ping" />
-          </div>
-        </div>
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <div className="text-center space-y-2">
           <p className="text-xl font-headline font-bold text-primary">Synchronizing Workspace</p>
           <p className="text-muted-foreground animate-pulse">Fetching real-time inventory and logistics data...</p>
@@ -208,7 +195,6 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Main Analytics Area */}
         <div className="lg:col-span-8 space-y-8">
           <Card className="border-none shadow-sm min-h-[450px] flex flex-col bg-white rounded-3xl overflow-hidden">
             <CardHeader className="pb-2">
@@ -216,14 +202,6 @@ export default function AdminDashboard() {
                 <div>
                   <CardTitle className="text-xl font-bold text-primary">Market Performance</CardTitle>
                   <CardDescription>Financial transaction trends over the current week</CardDescription>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
-                    <div className="h-3 w-3 rounded-full bg-primary" /> Previous
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
-                    <div className="h-3 w-3 rounded-full bg-accent" /> Projected
-                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -255,14 +233,12 @@ export default function AdminDashboard() {
                           boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
                           padding: '12px 16px'
                         }}
-                        itemStyle={{ fontWeight: 'bold', color: '#e15d2a' }}
                       />
                       <Bar dataKey="total" radius={[8, 8, 0, 0]} barSize={40}>
                         {chartData.map((entry, index) => (
                           <Cell 
                             key={`cell-${index}`} 
                             fill={entry.total === Math.max(...chartData.map(d => d.total)) ? '#e15d2a' : '#2d4b38'} 
-                            className="transition-all duration-500 hover:opacity-80"
                           />
                         ))}
                       </Bar>
@@ -271,59 +247,14 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center text-center py-20 space-y-6 opacity-40">
-                  <div className="bg-slate-100 p-8 rounded-full">
-                    <BarChart3 className="h-16 w-16 text-slate-400" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xl font-bold text-slate-600">Market Data Pending</p>
-                    <p className="text-sm text-slate-500 max-w-xs mx-auto">Visual performance metrics will populate here as sales are recorded.</p>
-                  </div>
+                  <BarChart3 className="h-16 w-16 text-slate-400" />
+                  <p className="text-sm font-bold text-slate-600">Market Data Pending</p>
                 </div>
               )}
             </CardContent>
           </Card>
-
-          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
-            <CardHeader className="border-b bg-slate-50/30">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-bold flex items-center gap-2">
-                  <Warehouse className="h-5 w-5 text-accent" />
-                  Network Distribution Summary
-                </CardTitle>
-                <Link href="/admin/warehouses" className="text-xs font-black uppercase tracking-widest text-accent hover:underline">
-                  View Network Map
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-                {warehouseStats.length > 0 ? warehouseStats.map((w, i) => (
-                  <div key={i} className="p-6 space-y-3 hover:bg-slate-50 transition-colors cursor-default">
-                    <p className="text-xs font-black text-muted-foreground uppercase tracking-tighter">{w.name}</p>
-                    <div className="space-y-1">
-                      <div className="text-2xl font-black text-primary">{w.units}</div>
-                      <p className="text-[10px] text-muted-foreground font-bold">Total Physical Units</p>
-                    </div>
-                    <div className="flex items-center justify-between pt-2">
-                      <Badge className="bg-primary/5 text-primary text-[9px] font-black border-none px-2 py-0.5">
-                        {w.count} SKUs
-                      </Badge>
-                      <Link href={`/admin/warehouses/${w.id}`}>
-                        <ChevronRight className="h-4 w-4 text-slate-300 hover:text-accent" />
-                      </Link>
-                    </div>
-                  </div>
-                )) : (
-                  <div className="col-span-4 p-12 text-center text-muted-foreground text-sm italic">
-                    No active storage locations recorded in the network.
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Actionable Side Panel */}
         <div className="lg:col-span-4 space-y-8">
           <Card className={cn(
             "border-none shadow-lg rounded-3xl overflow-hidden transition-all duration-500",
@@ -332,18 +263,15 @@ export default function AdminDashboard() {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className={cn("p-2 rounded-xl", lowStockItems.length > 0 ? "bg-white/20" : "bg-red-50")}>
-                    <AlertTriangle className={cn("h-5 w-5", lowStockItems.length > 0 ? "text-white" : "text-red-600")} />
-                  </div>
+                  <AlertTriangle className={cn("h-5 w-5", lowStockItems.length > 0 ? "text-white" : "text-red-600")} />
                   <CardTitle className="text-lg font-bold">Stock Alerts</CardTitle>
                 </div>
-                {lowStockItems.length > 0 && <span className="animate-pulse h-2 w-2 bg-white rounded-full" />}
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {lowStockItems.length > 0 ? lowStockItems.map((item: any, i) => (
-                  <div key={i} className="p-4 bg-white/10 rounded-2xl border border-white/20 flex flex-col gap-1.5 transition-all hover:bg-white/20">
+                  <div key={i} className="p-4 bg-white/10 rounded-2xl border border-white/20 flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm truncate pr-4">{item.name}</span>
                       <Badge className="bg-white text-red-600 font-black text-[10px] rounded-lg">
@@ -359,10 +287,8 @@ export default function AdminDashboard() {
                   </div>
                 )) : (
                   <div className="text-center py-10 space-y-3 opacity-60">
-                    <div className="h-12 w-12 bg-emerald-100 rounded-full mx-auto flex items-center justify-center text-emerald-600">
-                      <ShieldCheck className="h-6 w-6" />
-                    </div>
-                    <p className="text-sm font-bold">Inventory Levels Stable</p>
+                    <ShieldCheck className="h-10 w-10 mx-auto text-emerald-600" />
+                    <p className="text-sm font-bold text-emerald-600">Inventory Levels Stable</p>
                   </div>
                 )}
               </div>
@@ -375,56 +301,6 @@ export default function AdminDashboard() {
               >
                 <Link href="/admin/products">Inventory Manager</Link>
               </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
-            <CardHeader className="pb-4 flex flex-row items-center justify-between bg-slate-50/50">
-              <div className="flex items-center gap-2">
-                <Truck className="h-5 w-5 text-accent" />
-                <CardTitle className="text-lg font-bold text-primary">Live Dispatch</CardTitle>
-              </div>
-              <Badge variant="outline" className="border-accent text-accent font-black text-[9px] uppercase">Mombasa Hub</Badge>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="divide-y divide-slate-50">
-                {deliveries?.slice(0, 5).length > 0 ? deliveries.slice(0, 5).map((delivery: any, i) => (
-                  <div key={i} className="p-5 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                    <div className="flex items-center space-x-4 min-w-0">
-                      <div className={cn(
-                        "p-2 rounded-xl flex-shrink-0",
-                        delivery.status === 'Delivered' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'
-                      )}>
-                        {delivery.status === 'Delivered' ? <ShieldCheck className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-primary truncate text-sm">{delivery.customerName}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium uppercase truncate">{delivery.location}</p>
-                      </div>
-                    </div>
-                    <Badge 
-                      className={cn(
-                        "font-black text-[9px] uppercase px-2 py-0.5 rounded-lg border-none",
-                        delivery.status === 'Out for Delivery' && "bg-blue-100 text-blue-700",
-                        delivery.status === 'Pending' && "bg-yellow-100 text-yellow-700",
-                        delivery.status === 'Delivered' && "bg-emerald-100 text-emerald-700",
-                        delivery.status === 'Cancelled' && "bg-slate-100 text-slate-500"
-                      )}
-                    >
-                      {delivery.status}
-                    </Badge>
-                  </div>
-                )) : (
-                  <div className="p-12 text-center text-muted-foreground text-sm italic opacity-50">
-                    No active dispatches found.
-                  </div>
-                )}
-              </div>
-              <div className="p-4 bg-slate-50/50 border-t">
-                <Button variant="ghost" className="w-full font-black text-[11px] uppercase tracking-[0.2em] text-accent hover:bg-accent/5" asChild>
-                  <Link href="/admin/deliveries">Track All Logistics</Link>
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </div>

@@ -28,7 +28,7 @@ export function useDoc<T = DocumentData>(docRef: DocumentReference<T> | null) {
       },
       async (serverError) => {
         const permissionError = new FirestorePermissionError({
-          path: docRef.path,
+          path: docRef.path || 'unknown_document',
           operation: 'get',
         });
         errorEmitter.emit('permission-error', permissionError);
