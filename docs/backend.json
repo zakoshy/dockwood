@@ -67,6 +67,32 @@
       },
       "required": ["customerName", "productId", "quantity", "totalAmount"]
     },
+    "Receipt": {
+      "title": "Receipt",
+      "description": "A formal receipt document generated for a customer.",
+      "type": "object",
+      "properties": {
+        "receiptNumber": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "quantity": { "type": "number" },
+              "unitPrice": { "type": "number" },
+              "total": { "type": "number" }
+            }
+          }
+        },
+        "totalAmount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerName", "totalAmount"]
+    },
     "Delivery": {
       "title": "Delivery",
       "description": "A logistics entry for tracking a delivery.",
@@ -115,6 +141,10 @@
     "/sales/{saleId}": {
       "schema": "Sale",
       "description": "History of all sales transactions."
+    },
+    "/receipts/{receiptId}": {
+      "schema": "Receipt",
+      "description": "Generated formal receipts."
     },
     "/deliveries/{deliveryId}": {
       "schema": "Delivery",

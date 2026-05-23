@@ -15,7 +15,8 @@ import {
   Loader2,
   BarChart2,
   Warehouse,
-  Construction
+  Construction,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Materials Library", href: "/admin/materials", icon: Construction },
     { name: "Inventory", href: "/admin/products", icon: Package },
     { name: "Sales", href: "/admin/sales", icon: ShoppingCart },
+    { name: "Receipt Generator", href: "/admin/receipts", icon: FileText },
     { name: "Deliveries", href: "/admin/deliveries", icon: Truck },
   ];
 
@@ -80,7 +82,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-primary text-primary-foreground">
+    <div className="flex flex-col h-full bg-primary text-primary-foreground print:hidden">
       <div className="p-6">
         <Link href="/admin" className="flex items-center space-x-2">
           <span className="text-xl font-headline font-bold">
@@ -131,12 +133,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 shadow-xl z-20">
+      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 shadow-xl z-20 print:hidden">
         <SidebarContent />
       </aside>
 
       <div className="flex-1 lg:pl-64 flex flex-col">
-        <header className="lg:hidden h-16 border-b bg-white flex items-center justify-between px-4 sticky top-0 z-30">
+        <header className="lg:hidden h-16 border-b bg-white flex items-center justify-between px-4 sticky top-0 z-30 print:hidden">
           <Link href="/admin" className="text-xl font-headline font-bold text-primary">
             Dockwood<span className="text-accent"> Furnitures</span>
           </Link>
@@ -155,7 +157,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </Sheet>
         </header>
 
-        <main className="p-4 md:p-8 lg:p-10 flex-grow animate-in fade-in duration-500">
+        <main className="p-4 md:p-8 lg:p-10 flex-grow animate-in fade-in duration-500 print:p-0">
           {children}
         </main>
       </div>
