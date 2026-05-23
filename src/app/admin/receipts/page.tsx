@@ -52,10 +52,10 @@ export default function ReceiptGenerator() {
   const [items, setItems] = useState<ReceiptItem[]>([{ description: "", quantity: 1, unitPrice: 0, total: 0 }]);
   const [receiptNumber, setReceiptNumber] = useState(`DW-${Math.floor(100000 + Math.random() * 900000)}`);
   
-  // Dockwood Details (Fixed)
+  // Dockwood Details
   const companyPin = "P051234567A"; 
 
-  // History State - Guarded by user auth
+  // History State
   const receiptsQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(collection(db, "receipts"), orderBy("createdAt", "desc"));
@@ -75,7 +75,7 @@ export default function ReceiptGenerator() {
     return items.reduce((acc, item) => acc + (item.quantity * item.unitPrice), 0);
   };
 
-  const vatRate = 0.16; // 16% Kenyan VAT
+  const vatRate = 0.16;
   const totalAmount = calculateSubtotal();
   const vatableAmount = totalAmount / (1 + vatRate);
   const vatAmount = totalAmount - vatableAmount;
@@ -128,7 +128,9 @@ export default function ReceiptGenerator() {
   };
 
   const handlePrint = () => {
-    window.print();
+    if (typeof window !== "undefined") {
+      window.print();
+    }
   };
 
   const resetForm = () => {
@@ -145,12 +147,16 @@ export default function ReceiptGenerator() {
     return (
       <div className="animate-in fade-in duration-500 max-w-2xl mx-auto space-y-8 pb-20">
         <div className="flex justify-between items-center print:hidden">
-          <Button variant="outline" onClick={() => setShowPrintPreview(false)} className="rounded-xl">
+          <Button type="button" variant="outline" onClick={() => setShowPrintPreview(false)} className="rounded-xl">
             <ArrowLeft className="mr-2 h-4 w-4" /> Edit Receipt
           </Button>
           <div className="flex gap-2">
-            <Button onClick={resetForm} variant="secondary" className="rounded-xl font-bold">New Receipt</Button>
-            <Button onClick={handlePrint} className="bg-accent hover:bg-accent/90 rounded-xl font-bold shadow-lg shadow-accent/20">
+            <Button type="button" onClick={resetForm} variant="secondary" className="rounded-xl font-bold">New Receipt</Button>
+            <Button 
+              type="button"
+              onClick={handlePrint} 
+              className="bg-accent hover:bg-accent/90 rounded-xl font-bold shadow-lg shadow-accent/20"
+            >
               <Printer className="mr-2 h-4 w-4" /> Print Receipt
             </Button>
           </div>
@@ -267,8 +273,8 @@ export default function ReceiptGenerator() {
           <p className="text-muted-foreground font-medium">Standard Kenyan Tax Format (eTIMS Placeholder Support)</p>
         </div>
         <div className="bg-white p-1 rounded-xl shadow-sm border flex">
-           <Button variant="ghost" className="rounded-lg h-9 px-4 text-xs font-black bg-accent text-white hover:bg-accent hover:text-white">NEW RECEIPT</Button>
-           <Button variant="ghost" className="rounded-lg h-9 px-4 text-xs font-bold text-muted-foreground hover:bg-slate-50">HISTORY</Button>
+           <Button type="button" variant="ghost" className="rounded-lg h-9 px-4 text-xs font-black bg-accent text-white hover:bg-accent hover:text-white">NEW RECEIPT</Button>
+           <Button type="button" variant="ghost" className="rounded-lg h-9 px-4 text-xs font-bold text-muted-foreground hover:bg-slate-50">HISTORY</Button>
         </div>
       </div>
 
@@ -347,7 +353,7 @@ export default function ReceiptGenerator() {
                  </div>
                  <CardTitle className="text-lg font-bold">Itemized Entry</CardTitle>
               </div>
-              <Button onClick={addItem} variant="outline" className="rounded-xl h-9 text-xs font-black border-accent text-accent hover:bg-accent hover:text-white">
+              <Button type="button" onClick={addItem} variant="outline" className="rounded-xl h-9 text-xs font-black border-accent text-accent hover:bg-accent hover:text-white">
                  <Plus className="mr-2 h-3.5 w-3.5" /> ADD LINE
               </Button>
             </CardHeader>
@@ -391,6 +397,7 @@ export default function ReceiptGenerator() {
                       </td>
                       <td className="px-8 py-6 text-right w-20">
                         <Button 
+                          type="button"
                           variant="ghost" 
                           size="icon" 
                           onClick={() => removeItem(index)}
@@ -445,6 +452,7 @@ export default function ReceiptGenerator() {
               </div>
 
               <Button 
+                type="button"
                 onClick={handleGenerateReceipt}
                 className="w-full h-14 bg-accent hover:bg-accent/90 text-white font-black rounded-2xl shadow-xl shadow-accent/20 text-lg transition-transform active:scale-95"
                 disabled={isGenerating}
