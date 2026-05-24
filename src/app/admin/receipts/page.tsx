@@ -23,7 +23,8 @@ import {
   Hash,
   Info,
   Calendar,
-  CreditCard
+  CreditCard,
+  X
 } from "lucide-react";
 import { 
   AlertDialog, 
@@ -64,7 +65,7 @@ export default function DocumentGenerator() {
 
   // Corporate Constants
   const companyPin = "P051234567A"; 
-  const fixedTerms = "1. Goods once sold are not returnable. 2. Payments should be made to the account details provided below. 3. This is a computer-generated document and is valid without a physical stamp.";
+  const fixedTerms = "1. Goods once sold are not returnable. 2. Payments should be made to the account details provided. 3. This is a computer-generated document and is valid without a physical stamp.";
 
   // Form States
   const [customerName, setCustomerName] = useState("");
@@ -189,7 +190,6 @@ export default function DocumentGenerator() {
   };
 
   if (showPrintPreview) {
-    const headerLabel = docType === "Invoice" ? "INVOICE TO" : docType === "Quotation" ? "QUOTATION FOR" : "RECEIPT TO";
     return (
       <div className="animate-in fade-in duration-500 max-w-4xl mx-auto space-y-8 pb-20">
         <style dangerouslySetInnerHTML={{ __html: `
@@ -217,152 +217,150 @@ export default function DocumentGenerator() {
           </div>
         </div>
 
-        <div id="printable-doc" className="bg-white shadow-2xl border-t-[12px] border-accent min-h-[1100px] flex flex-col font-sans">
-          {/* Top Banner */}
-          <div className="bg-primary text-white p-12 relative overflow-hidden">
-             <div className="absolute top-0 right-0 w-1/3 h-full bg-accent -skew-x-12 translate-x-16 opacity-90"></div>
-             <div className="relative z-10 flex justify-between items-start">
-                <div className="flex items-center gap-6">
-                   <div className="h-20 w-20 bg-white rounded-2xl p-1 shadow-2xl">
-                      <div className="relative h-full w-full rounded-xl overflow-hidden">
-                        <Image src="/logo.jpeg" alt="Logo" fill className="object-cover" />
-                      </div>
-                   </div>
-                   <div>
-                      <h1 className="text-3xl font-black tracking-tighter uppercase leading-none mb-1">DOCKWOOD FURNITURES</h1>
-                      <p className="text-accent font-black tracking-[0.2em] text-[10px] uppercase">Timber & Bespoke Craftsmanship</p>
-                   </div>
-                </div>
-                <div className="text-right">
-                   <h2 className="text-5xl font-black text-white uppercase tracking-tighter leading-none">{docType}</h2>
-                   <div className="mt-4 flex flex-col items-end gap-1">
-                      <span className="text-[10px] font-bold text-white/50 uppercase tracking-widest">Document Number</span>
-                      <span className="text-xl font-black text-accent">{docNumber}</span>
-                   </div>
-                </div>
-             </div>
+        <div id="printable-doc" className="bg-white shadow-none min-h-[1100px] flex flex-col font-sans">
+          {/* Header Section from Reference */}
+          <div className="bg-primary text-white p-10 relative overflow-hidden flex justify-between items-center h-48">
+            <div className="relative z-10 flex items-center gap-4">
+              <div className="h-16 w-16 bg-white rounded-full p-1 shadow-lg flex items-center justify-center">
+                 <div className="relative h-10 w-10">
+                   <Image src="/logo.jpeg" alt="Logo" fill className="object-contain" />
+                 </div>
+              </div>
+              <div>
+                <h1 className="text-2xl font-black uppercase tracking-tight">DOCKWOOD FURNITURES</h1>
+                <p className="text-xs font-medium opacity-80 uppercase tracking-widest">Premium Timber & Craftsmanship</p>
+              </div>
+            </div>
+            
+            {/* Skewed Background Element */}
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-accent skew-x-[-20deg] translate-x-12 z-0"></div>
+            
+            <div className="relative z-10 text-right pr-6">
+              <h2 className="text-6xl font-black uppercase tracking-tighter text-white/90">{docType}</h2>
+            </div>
           </div>
 
-          <div className="p-12 flex-1 flex flex-col">
-             {/* Info Bar */}
-             <div className="grid grid-cols-2 gap-12 mb-12 border-b border-slate-100 pb-8">
-                <div className="space-y-3">
-                   <div className="flex items-start gap-2 text-[13px] font-medium text-slate-600">
-                      <MapPin className="h-4 w-4 text-accent mt-0.5" />
-                      <span>Bombolulu, Kisimani, Opposite Petrocity, Mombasa</span>
-                   </div>
-                   <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600">
-                      <Phone className="h-4 w-4 text-accent" />
-                      <span>+254 711 662 626</span>
-                   </div>
-                   <div className="flex items-center gap-2 text-[13px] font-medium text-slate-600">
-                      <Mail className="h-4 w-4 text-accent" />
-                      <span>info@dockwoodfurnitures.com</span>
-                   </div>
-                </div>
-                <div className="text-right space-y-1">
-                   <p className="text-[10px] font-black uppercase text-slate-300 tracking-widest">Dockwood KRA PIN</p>
-                   <p className="text-primary font-black text-2xl tracking-tighter">{companyPin}</p>
-                </div>
-             </div>
-
-             {/* Addresses */}
-             <div className="grid grid-cols-2 gap-20 mb-16">
-                <div className="space-y-4">
-                   <Badge className="bg-accent text-white font-black text-[10px] uppercase tracking-widest rounded-sm h-7 px-4">{headerLabel}</Badge>
-                   <div className="space-y-1">
-                      <h3 className="text-2xl font-black text-primary leading-tight">{customerName}</h3>
-                      <div className="text-sm text-slate-500 font-medium space-y-1">
-                         {customerAddress && <p>{customerAddress}</p>}
-                         {customerPhone && <p>Phone: {customerPhone}</p>}
-                         {customerEmail && <p>Email: {customerEmail}</p>}
-                         {customerPin && <p className="font-bold text-slate-700 mt-3 border-t pt-2 border-slate-100 inline-block">Customer PIN: {customerPin}</p>}
-                      </div>
-                   </div>
-                </div>
-                <div className="text-right pt-4">
-                   <div className="space-y-6">
-                      <div className="flex flex-col items-end gap-1">
-                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date Issued</span>
-                         <span className="text-lg font-bold text-primary">{new Date().toLocaleDateString('en-KE', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Payment Mode</span>
-                         <span className="text-sm font-black text-accent uppercase">{paymentMethod}</span>
-                      </div>
-                   </div>
-                </div>
-             </div>
-
-             {/* Corporate Table */}
-             <div className="mb-12 overflow-hidden rounded-xl border border-slate-200">
-                <table className="w-full">
-                   <thead>
-                      <tr className="bg-primary text-white">
-                         <th className="px-6 py-4 text-left text-[11px] font-black uppercase tracking-widest">Description of Products/Services</th>
-                         <th className="px-6 py-4 text-center text-[11px] font-black uppercase tracking-widest w-24">Unit Price</th>
-                         <th className="px-6 py-4 text-center text-[11px] font-black uppercase tracking-widest w-20">Qty</th>
-                         <th className="px-6 py-4 text-right text-[11px] font-black uppercase tracking-widest w-32">Amount (KES)</th>
-                      </tr>
-                   </thead>
-                   <tbody className="divide-y divide-slate-100">
-                      {items.map((item, i) => (
-                         <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-slate-50/50"}>
-                            <td className="px-6 py-5">
-                               <p className="font-bold text-primary text-base leading-tight">{item.description}</p>
-                            </td>
-                            <td className="px-6 py-5 text-center text-slate-600 font-semibold">{item.unitPrice.toLocaleString()}</td>
-                            <td className="px-6 py-5 text-center text-slate-600 font-black">{item.quantity}</td>
-                            <td className="px-6 py-5 text-right font-black text-primary">{item.total.toLocaleString()}</td>
-                         </tr>
-                      ))}
-                   </tbody>
-                </table>
-             </div>
-
-             {/* Final Totals Section */}
-             <div className="mt-auto pt-8 border-t-2 border-slate-100">
-                <div className="grid grid-cols-12 gap-12">
-                   <div className="col-span-7 space-y-6">
-                      <div className="space-y-3">
-                         <div className="flex items-center gap-2">
-                            <Info className="h-4 w-4 text-accent" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Terms & Conditions</span>
-                         </div>
-                         <p className="text-[11px] text-slate-500 font-medium leading-relaxed max-w-md italic">
-                            {fixedTerms}
-                         </p>
-                      </div>
-                      <div className="pt-8">
-                         <p className="text-xl font-black text-primary opacity-20 uppercase tracking-widest">Dockwood Furnitures Ltd</p>
-                      </div>
-                   </div>
-                   <div className="col-span-5 space-y-3">
-                      <div className="flex justify-between items-center text-xs font-bold text-slate-500">
-                         <span>Sub-Total:</span>
-                         <span className="text-slate-700">KES {vatableAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs font-bold text-slate-500">
-                         <span>VAT (16%):</span>
-                         <span className="text-slate-700">KES {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                      </div>
-                      <div className="flex justify-between items-center pt-6 border-t-4 border-slate-900 mt-4">
-                         <span className="text-sm font-black text-primary uppercase tracking-widest">Total Amount</span>
-                         <span className="text-4xl font-black text-accent tracking-tighter">KES {totalAmount.toLocaleString()}</span>
-                      </div>
-                      
-                      <div className="pt-16 text-right">
-                         <div className="inline-block w-48 border-b-2 border-slate-200 mb-2"></div>
-                         <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Authorize Official Sign</p>
-                      </div>
-                   </div>
-                </div>
-             </div>
+          {/* Contact Bar */}
+          <div className="bg-white px-10 py-6 border-b flex justify-between items-center">
+            <div className="flex gap-10">
+               <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                  <MapPin className="h-3.5 w-3.5 text-accent" />
+                  <span>Bombolulu, Mombasa, Kenya</span>
+               </div>
+               <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                  <Phone className="h-3.5 w-3.5 text-accent" />
+                  <span>+254 711 662 626</span>
+               </div>
+               <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                  <Mail className="h-3.5 w-3.5 text-accent" />
+                  <span>info@dockwoodfurnitures.com</span>
+               </div>
+            </div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              PIN: <span className="text-primary">{companyPin}</span>
+            </div>
           </div>
 
-          {/* Solid Bottom Banner */}
-          <div className="bg-primary h-14 flex items-center justify-center">
-             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">Quality Woodwork That Lasts a Lifetime</p>
+          <div className="p-10 flex-grow">
+            {/* Bill To & Meta Info */}
+            <div className="grid grid-cols-2 gap-20 mb-12">
+              <div className="space-y-4">
+                <Badge className="bg-accent text-white uppercase font-black text-[10px] tracking-widest rounded-sm py-1 px-4">{docType} To</Badge>
+                <div className="space-y-1">
+                   <h3 className="text-xl font-black text-primary uppercase">{customerName}</h3>
+                   <div className="text-[12px] text-slate-500 font-medium space-y-0.5">
+                      <p>Phone: {customerPhone}</p>
+                      <p>Email: {customerEmail}</p>
+                      <p>Address: {customerAddress}</p>
+                      {customerPin && <p className="font-bold text-slate-800">PIN: {customerPin}</p>}
+                   </div>
+                </div>
+              </div>
+              <div className="text-right space-y-4">
+                <div className="space-y-1">
+                  <div className="flex justify-end items-center gap-2">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{docType} No:</span>
+                    <span className="text-primary font-black text-sm">{docNumber}</span>
+                  </div>
+                  <div className="flex justify-end items-center gap-2">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{docType} Date:</span>
+                    <span className="text-primary font-black text-sm">{new Date().toLocaleDateString()}</span>
+                  </div>
+                </div>
+                
+                <Badge className="bg-accent text-white uppercase font-black text-[10px] tracking-widest rounded-sm py-1 px-4">Payment Method</Badge>
+                <div className="text-[12px] text-slate-500 font-medium space-y-0.5 mt-1">
+                  <p>Mode: <span className="font-bold text-primary">{paymentMethod}</span></p>
+                  <p>Account: Dockwood Furnitures Ltd</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Table - Dark Header */}
+            <div className="mb-10 rounded-sm overflow-hidden border border-slate-200">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-primary text-white">
+                    <th className="px-6 py-4 text-left text-[11px] font-black uppercase tracking-widest">Product Description</th>
+                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-24">Price</th>
+                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-20">QTY</th>
+                    <th className="px-6 py-4 text-right text-[11px] font-black uppercase tracking-widest w-32">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {items.map((item, i) => (
+                    <tr key={i} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-5">
+                         <p className="font-bold text-primary text-sm">{item.description}</p>
+                      </td>
+                      <td className="px-4 py-5 text-center text-slate-600 font-semibold text-sm">KES {item.unitPrice.toLocaleString()}</td>
+                      <td className="px-4 py-5 text-center text-slate-600 font-black text-sm">{item.quantity}</td>
+                      <td className="px-6 py-5 text-right font-black text-primary text-sm">KES {item.total.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Totals Section */}
+            <div className="flex justify-end">
+              <div className="w-80 space-y-2 border-t pt-4">
+                <div className="flex justify-between text-[13px] font-bold text-slate-500 px-2">
+                  <span>Sub Total:</span>
+                  <span className="text-primary">KES {calculateSubtotal().toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-[13px] font-bold text-slate-500 px-2">
+                  <span>VAT (16%):</span>
+                  <span className="text-primary">KES {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                </div>
+                <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 mt-4">
+                   <span className="text-xs font-black text-primary uppercase tracking-widest">Grand Total:</span>
+                   <span className="text-2xl font-black text-accent tracking-tighter">KES {totalAmount.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Elements */}
+            <div className="mt-20 grid grid-cols-2 gap-10 items-end">
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Badge className="bg-accent text-white uppercase font-black text-[10px] tracking-widest rounded-sm py-1 px-4">Terms & Condition</Badge>
+                  <p className="text-[10px] text-slate-400 font-medium leading-relaxed max-w-xs uppercase">
+                    {fixedTerms}
+                  </p>
+                </div>
+                <h4 className="text-lg font-black text-primary uppercase italic opacity-40">Thanks For Your Business</h4>
+              </div>
+              <div className="text-right space-y-2">
+                 <div className="inline-block w-48 border-b-2 border-slate-300"></div>
+                 <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest pr-4">Authorize signature</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Solid Stripe */}
+          <div className="bg-primary h-12 flex items-center justify-center mt-10">
+            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/30">DOCKWOOD FURNITURES LIMITED - QUALITY GUARANTEED</p>
           </div>
         </div>
       </div>
@@ -525,23 +523,6 @@ export default function DocumentGenerator() {
               </table>
             </CardContent>
           </Card>
-
-          <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white opacity-80 grayscale-[0.5]">
-            <CardHeader className="bg-slate-50/50 py-4 border-b">
-               <div className="flex items-center gap-2">
-                  <Info className="h-4 w-4 text-accent" />
-                  <CardTitle className="text-xs font-bold uppercase tracking-widest">Document Terms (Standard)</CardTitle>
-               </div>
-            </CardHeader>
-            <CardContent className="p-8">
-               <div className="bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200">
-                  <p className="text-xs font-medium text-slate-500 italic leading-relaxed">
-                     {fixedTerms}
-                  </p>
-                  <p className="text-[10px] mt-4 font-black text-slate-400 uppercase tracking-widest">Note: Terms are fixed for all corporate documents.</p>
-               </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="lg:col-span-4 space-y-8">
@@ -602,7 +583,7 @@ export default function DocumentGenerator() {
             <CardHeader className="flex flex-row items-center justify-between border-b bg-slate-50/50 p-6">
                <div className="flex items-center gap-2">
                   <History className="h-4 w-4 text-accent" />
-                  <CardTitle className="text-[10px] font-black uppercase tracking-widest">Recent Sales</CardTitle>
+                  <CardTitle className="text-[10px] font-black uppercase tracking-widest">Recent Documents</CardTitle>
                </div>
             </CardHeader>
             <CardContent className="p-0">
