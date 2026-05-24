@@ -194,6 +194,10 @@ export default function DocumentGenerator() {
     return "Receipt To";
   };
 
+  // Generate empty rows for a realistic look
+  const minRows = 8;
+  const emptyRows = Math.max(0, minRows - items.length);
+
   if (showPrintPreview) {
     return (
       <div className="animate-in fade-in duration-500 max-w-4xl mx-auto space-y-8 pb-20">
@@ -224,35 +228,35 @@ export default function DocumentGenerator() {
 
         <div id="printable-doc" className="bg-white shadow-none min-h-[1100px] flex flex-col font-sans">
           {/* Header Section */}
-          <div className="bg-[#2d4b38] text-white p-10 relative overflow-hidden flex justify-between items-center h-48">
+          <div className="bg-[#2d4b38] text-white p-8 relative overflow-hidden flex justify-between items-center h-40">
             <div className="relative z-10 flex items-center gap-4">
-              <div className="h-16 w-16 bg-white rounded-full p-1 shadow-lg flex items-center justify-center">
+              <div className="h-14 w-14 bg-white rounded-full p-1 shadow-lg flex items-center justify-center">
                  <div className="relative h-10 w-10">
                    <Image src="/logo.jpeg" alt="Logo" fill className="object-contain" />
                  </div>
               </div>
               <div>
-                <h1 className="text-2xl font-black uppercase tracking-tight">DOCKWOOD FURNITURES</h1>
-                <p className="text-xs font-medium opacity-80 uppercase tracking-widest">Premium Timber & Craftsmanship</p>
+                <h1 className="text-xl font-black uppercase tracking-tight">DOCKWOOD FURNITURES</h1>
+                <p className="text-[10px] font-medium opacity-80 uppercase tracking-widest">Premium Timber & Craftsmanship</p>
               </div>
             </div>
             
             <div className="absolute top-0 right-0 w-1/2 h-full bg-[#e15d2a] skew-x-[-20deg] translate-x-12 z-0"></div>
             
             <div className="relative z-10 text-right pr-6">
-              <h2 className="text-6xl font-black uppercase tracking-tighter text-white/90">{docType}</h2>
+              <h2 className="text-5xl font-black uppercase tracking-tighter text-white/90">{docType}</h2>
             </div>
           </div>
 
           {/* Contact Bar */}
-          <div className="bg-white px-10 py-6 border-b flex justify-between items-center">
-            <div className="flex gap-10">
-               <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                  <MapPin className="h-3.5 w-3.5 text-[#e15d2a]" />
+          <div className="bg-white px-8 py-4 border-b flex justify-between items-center">
+            <div className="flex gap-8">
+               <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
+                  <MapPin className="h-3 w-3 text-[#e15d2a]" />
                   <span>Bombolulu, Mombasa, Kenya</span>
                </div>
-               <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                  <Phone className="h-3.5 w-3.5 text-[#e15d2a]" />
+               <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
+                  <Phone className="h-3 w-3 text-[#e15d2a]" />
                   <span>+254 711 662 626</span>
                </div>
             </div>
@@ -261,14 +265,14 @@ export default function DocumentGenerator() {
             </div>
           </div>
 
-          <div className="p-10 flex-grow">
+          <div className="p-8 flex-grow">
             {/* Bill To & Meta Info */}
-            <div className="grid grid-cols-2 gap-20 mb-12">
-              <div className="space-y-4">
-                <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[10px] tracking-widest rounded-sm py-1 px-4 border-none">{getRecipientLabel()}</Badge>
-                <div className="space-y-1">
-                   <h3 className="text-xl font-black text-[#2d4b38] uppercase">{customerName}</h3>
-                   <div className="text-[12px] text-slate-500 font-medium space-y-0.5">
+            <div className="grid grid-cols-2 gap-10 mb-8">
+              <div className="space-y-3">
+                <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">{getRecipientLabel()}</Badge>
+                <div className="space-y-0.5">
+                   <h3 className="text-lg font-black text-[#2d4b38] uppercase">{customerName}</h3>
+                   <div className="text-[11px] text-slate-500 font-medium space-y-0.5">
                       <p>Phone: {customerPhone}</p>
                       <p>Email: {customerEmail}</p>
                       <p>Address: {customerAddress}</p>
@@ -276,20 +280,20 @@ export default function DocumentGenerator() {
                    </div>
                 </div>
               </div>
-              <div className="text-right space-y-4">
-                <div className="space-y-1">
+              <div className="text-right space-y-3">
+                <div className="space-y-0.5">
                   <div className="flex justify-end items-center gap-2">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{docType} No:</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{docType} No:</span>
                     <span className="text-[#2d4b38] font-black text-sm">{docNumber}</span>
                   </div>
                   <div className="flex justify-end items-center gap-2">
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Date:</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date:</span>
                     <span className="text-[#2d4b38] font-black text-sm">{new Date().toLocaleDateString()}</span>
                   </div>
                 </div>
                 
-                <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[10px] tracking-widest rounded-sm py-1 px-4 border-none">Payment Info</Badge>
-                <div className="text-[12px] text-slate-500 font-medium space-y-1 mt-1">
+                <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">Payment Info</Badge>
+                <div className="text-[11px] text-slate-500 font-medium space-y-0.5 mt-0.5">
                   <p>Mode: <span className="font-bold text-[#2d4b38]">{paymentMethod}</span></p>
                   <p>Paybill: <span className="font-bold text-[#e15d2a]">{paybillNumber}</span></p>
                   <p>Account: <span className="font-bold text-[#2d4b38]">{accountNumber}</span></p>
@@ -298,67 +302,76 @@ export default function DocumentGenerator() {
             </div>
 
             {/* Product Table */}
-            <div className="mb-10 rounded-sm overflow-hidden border border-slate-200">
+            <div className="mb-8 rounded-sm overflow-hidden border border-slate-200">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-[#2d4b38] text-white">
-                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-12 border-r border-white/10">#</th>
-                    <th className="px-6 py-4 text-left text-[11px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
-                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-24 border-r border-white/10">Unit Price</th>
-                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-20 border-r border-white/10">QTY</th>
-                    <th className="px-6 py-4 text-right text-[11px] font-black uppercase tracking-widest w-32">Total</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest w-10 border-r border-white/10">#</th>
+                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest w-24 border-r border-white/10">Unit Price</th>
+                    <th className="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest w-16 border-r border-white/10">QTY</th>
+                    <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest w-28">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {items.map((item, i) => (
                     <tr key={i} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-5 text-center text-slate-600 font-bold text-sm border-r border-slate-100">{i + 1}</td>
-                      <td className="px-6 py-5 border-r border-slate-100">
-                         <p className="font-bold text-[#2d4b38] text-sm">{item.description}</p>
+                      <td className="px-3 py-4 text-center text-slate-600 font-bold text-[11px] border-r border-slate-100">{i + 1}</td>
+                      <td className="px-4 py-4 border-r border-slate-100">
+                         <p className="font-bold text-[#2d4b38] text-[12px]">{item.description}</p>
                       </td>
-                      <td className="px-4 py-5 text-center text-slate-600 font-semibold text-sm border-r border-slate-100">Ksh {item.unitPrice.toLocaleString()}</td>
-                      <td className="px-4 py-5 text-center text-slate-600 font-black text-sm border-r border-slate-100">{item.quantity}</td>
-                      <td className="px-6 py-5 text-right font-black text-[#2d4b38] text-sm">Ksh {item.total.toLocaleString()}</td>
+                      <td className="px-3 py-4 text-center text-slate-600 font-semibold text-[11px] border-r border-slate-100">Ksh {item.unitPrice.toLocaleString()}</td>
+                      <td className="px-3 py-4 text-center text-slate-600 font-black text-[11px] border-r border-slate-100">{item.quantity}</td>
+                      <td className="px-4 py-4 text-right font-black text-[#2d4b38] text-[12px]">Ksh {item.total.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                  {Array.from({ length: emptyRows }).map((_, i) => (
+                    <tr key={`empty-${i}`} className="h-10">
+                      <td className="border-r border-slate-100"></td>
+                      <td className="border-r border-slate-100"></td>
+                      <td className="border-r border-slate-100"></td>
+                      <td className="border-r border-slate-100"></td>
+                      <td></td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot className="border-t-2 border-[#2d4b38]">
                   <tr>
-                    <td colSpan={3} className="px-6 py-3 text-right text-[11px] font-black uppercase text-slate-500 tracking-widest">Sub Total</td>
-                    <td colSpan={2} className="px-6 py-3 text-right font-bold text-[#2d4b38] border-l border-slate-100">Ksh {calculateSubtotal().toLocaleString()}</td>
+                    <td colSpan={3} className="px-4 py-2 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">Sub Total</td>
+                    <td colSpan={2} className="px-4 py-2 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[12px]">Ksh {calculateSubtotal().toLocaleString()}</td>
                   </tr>
                   <tr>
-                    <td colSpan={3} className="px-6 py-3 text-right text-[11px] font-black uppercase text-slate-500 tracking-widest">VAT (16%)</td>
-                    <td colSpan={2} className="px-6 py-3 text-right font-bold text-[#2d4b38] border-l border-slate-100">Ksh {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                    <td colSpan={3} className="px-4 py-2 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">VAT (16%)</td>
+                    <td colSpan={2} className="px-4 py-2 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[12px]">Ksh {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td colSpan={3} className="px-6 py-4 text-right text-[12px] font-black uppercase text-[#2d4b38] tracking-widest">Grand Total</td>
-                    <td colSpan={2} className="px-6 py-4 text-right font-black text-2xl text-[#e15d2a] tracking-tighter border-l border-slate-100">Ksh {totalAmount.toLocaleString()}</td>
+                    <td colSpan={3} className="px-4 py-3 text-right text-[10px] font-black uppercase text-[#2d4b38] tracking-widest">Grand Total</td>
+                    <td colSpan={2} className="px-4 py-3 text-right font-black text-xl text-[#e15d2a] tracking-tighter border-l border-slate-100">Ksh {totalAmount.toLocaleString()}</td>
                   </tr>
                 </tfoot>
               </table>
             </div>
 
             {/* Footer Elements */}
-            <div className="mt-20 grid grid-cols-2 gap-10 items-end">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[10px] tracking-widest rounded-sm py-1 px-4 border-none">Terms & Condition</Badge>
-                  <p className="text-[10px] text-slate-400 font-medium leading-relaxed max-w-xs uppercase">
+            <div className="mt-12 grid grid-cols-2 gap-10 items-end">
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">Terms & Condition</Badge>
+                  <p className="text-[9px] text-slate-400 font-medium leading-relaxed max-w-xs uppercase">
                     {fixedTerms}
                   </p>
                 </div>
-                <h4 className="text-lg font-black text-[#2d4b38] uppercase italic opacity-40">Thanks For Your Business</h4>
+                <h4 className="text-md font-black text-[#2d4b38] uppercase italic opacity-40">Thanks For Your Business</h4>
               </div>
               <div className="text-right space-y-2">
-                 <div className="inline-block w-48 border-b-2 border-slate-300"></div>
-                 <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest pr-4">Authorize signature</p>
+                 <div className="inline-block w-40 border-b-2 border-slate-300"></div>
+                 <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest pr-4">Authorize signature</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#2d4b38] h-12 flex items-center justify-center mt-10">
-            <p className="text-[9px] font-black uppercase tracking-[0.5em] text-white/30">DOCKWOOD FURNITURES LIMITED - QUALITY GUARANTEED</p>
+          <div className="bg-[#2d4b38] h-10 flex items-center justify-center mt-6">
+            <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30">DOCKWOOD FURNITURES LIMITED - QUALITY GUARANTEED</p>
           </div>
         </div>
       </div>
