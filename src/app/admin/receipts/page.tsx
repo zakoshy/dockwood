@@ -65,7 +65,7 @@ export default function DocumentGenerator() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Corporate Constants
-  const companyPin = "P051234567A"; 
+  const companyPin = "A004777295T"; 
   const fixedTerms = "1. Goods once sold are not returnable. 2. Payments should be made to the account details provided. 3. This is a computer-generated document and is valid without a physical stamp.";
 
   // Form States
