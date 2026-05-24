@@ -49,7 +49,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Materials Library", href: "/admin/materials", icon: Construction },
     { name: "Inventory", href: "/admin/products", icon: Package },
     { name: "Sales", href: "/admin/sales", icon: ShoppingCart },
-    { name: "Receipt Generator", href: "/admin/receipts", icon: FileText },
+    { name: "Billing & Docs", href: "/admin/receipts", icon: FileText },
     { name: "Deliveries", href: "/admin/deliveries", icon: Truck },
   ];
 

@@ -69,12 +69,15 @@
     },
     "Receipt": {
       "title": "Receipt",
-      "description": "A formal receipt document generated for a customer.",
+      "description": "A formal billing document (Receipt, Invoice, or Quotation).",
       "type": "object",
       "properties": {
+        "type": { "type": "string", "enum": ["Receipt", "Invoice", "Quotation"] },
         "receiptNumber": { "type": "string" },
         "customerName": { "type": "string" },
         "customerPhone": { "type": "string" },
+        "customerAddress": { "type": "string" },
+        "customerEmail": { "type": "string" },
         "items": {
           "type": "array",
           "items": {
@@ -88,10 +91,11 @@
           }
         },
         "totalAmount": { "type": "number" },
+        "vatAmount": { "type": "number" },
         "paymentMethod": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["customerName", "totalAmount"]
+      "required": ["customerName", "totalAmount", "type"]
     },
     "Delivery": {
       "title": "Delivery",
@@ -144,7 +148,7 @@
     },
     "/receipts/{receiptId}": {
       "schema": "Receipt",
-      "description": "Generated formal receipts."
+      "description": "Generated formal billing documents."
     },
     "/deliveries/{deliveryId}": {
       "schema": "Delivery",
