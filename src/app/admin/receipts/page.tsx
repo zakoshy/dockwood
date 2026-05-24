@@ -102,9 +102,9 @@ export default function DocumentGenerator() {
   };
 
   const vatRate = 0.16;
-  const totalAmount = calculateSubtotal();
-  const vatableAmount = totalAmount / (1 + vatRate);
-  const vatAmount = totalAmount - vatableAmount;
+  const subtotal = calculateSubtotal();
+  const vatableAmount = subtotal / (1 + vatRate);
+  const vatAmount = subtotal - vatableAmount;
 
   const addItem = () => {
     setItems([...items, { description: "", quantity: 1, unitPrice: 0, total: 0 }]);
@@ -249,7 +249,7 @@ export default function DocumentGenerator() {
           </div>
 
           {/* Contact Bar */}
-          <div className="bg-white px-8 py-4 border-b flex justify-between items-center">
+          <div className="bg-white px-8 py-3 border-b flex justify-between items-center">
             <div className="flex gap-8">
                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
                   <MapPin className="h-3 w-3 text-[#e15d2a]" />
@@ -261,18 +261,18 @@ export default function DocumentGenerator() {
                </div>
             </div>
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              PIN: <span className="text-[#2d4b38]">{companyPin}</span>
+              PIN: <span className="text-[#2d4b38] font-black">{companyPin}</span>
             </div>
           </div>
 
-          <div className="p-8 flex-grow">
-            {/* Bill To & Meta Info */}
-            <div className="grid grid-cols-2 gap-10 mb-8">
-              <div className="space-y-3">
+          <div className="px-8 pt-4 pb-8 flex-grow">
+            {/* Bill To & Meta Info - Tightly aligned to line above */}
+            <div className="grid grid-cols-2 gap-10 mb-6">
+              <div className="space-y-2">
                 <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">{getRecipientLabel()}</Badge>
                 <div className="space-y-0.5">
-                   <h3 className="text-lg font-black text-[#2d4b38] uppercase">{customerName}</h3>
-                   <div className="text-[11px] text-slate-500 font-medium space-y-0.5">
+                   <h3 className="text-lg font-black text-[#2d4b38] uppercase leading-none">{customerName}</h3>
+                   <div className="text-[11px] text-slate-500 font-medium space-y-0.5 mt-1">
                       <p>Phone: {customerPhone}</p>
                       <p>Email: {customerEmail}</p>
                       <p>Address: {customerAddress}</p>
@@ -280,7 +280,7 @@ export default function DocumentGenerator() {
                    </div>
                 </div>
               </div>
-              <div className="text-right space-y-3">
+              <div className="text-right space-y-2">
                 <div className="space-y-0.5">
                   <div className="flex justify-end items-center gap-2">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{docType} No:</span>
@@ -292,41 +292,43 @@ export default function DocumentGenerator() {
                   </div>
                 </div>
                 
-                <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">Payment Info</Badge>
-                <div className="text-[11px] text-slate-500 font-medium space-y-0.5 mt-0.5">
-                  <p>Mode: <span className="font-bold text-[#2d4b38]">{paymentMethod}</span></p>
-                  <p>Paybill: <span className="font-bold text-[#e15d2a]">{paybillNumber}</span></p>
-                  <p>Account: <span className="font-bold text-[#2d4b38]">{accountNumber}</span></p>
+                <div className="flex flex-col items-end gap-1 mt-1">
+                  <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">Payment Details</Badge>
+                  <div className="text-[11px] text-slate-500 font-medium space-y-0.5 text-right">
+                    <p>Mode: <span className="font-bold text-[#2d4b38]">{paymentMethod}</span></p>
+                    <p>Paybill: <span className="font-bold text-[#e15d2a]">{paybillNumber}</span></p>
+                    <p>Account: <span className="font-bold text-[#2d4b38]">{accountNumber}</span></p>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Product Table */}
-            <div className="mb-8 rounded-sm overflow-hidden border border-slate-200">
+            <div className="mb-6 rounded-sm overflow-hidden border border-slate-200">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-[#2d4b38] text-white">
-                    <th className="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest w-10 border-r border-white/10">#</th>
-                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest w-24 border-r border-white/10">Unit Price</th>
-                    <th className="px-3 py-3 text-center text-[10px] font-black uppercase tracking-widest w-16 border-r border-white/10">QTY</th>
-                    <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest w-28">Total</th>
+                    <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest w-10 border-r border-white/10">#</th>
+                    <th className="px-4 py-2 text-left text-[10px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
+                    <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest w-24 border-r border-white/10">Unit Price</th>
+                    <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest w-16 border-r border-white/10">QTY</th>
+                    <th className="px-4 py-2 text-right text-[10px] font-black uppercase tracking-widest w-28">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {items.map((item, i) => (
                     <tr key={i} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-3 py-4 text-center text-slate-600 font-bold text-[11px] border-r border-slate-100">{i + 1}</td>
-                      <td className="px-4 py-4 border-r border-slate-100">
+                      <td className="px-3 py-3 text-center text-slate-600 font-bold text-[11px] border-r border-slate-100">{i + 1}</td>
+                      <td className="px-4 py-3 border-r border-slate-100">
                          <p className="font-bold text-[#2d4b38] text-[12px]">{item.description}</p>
                       </td>
-                      <td className="px-3 py-4 text-center text-slate-600 font-semibold text-[11px] border-r border-slate-100">Ksh {item.unitPrice.toLocaleString()}</td>
-                      <td className="px-3 py-4 text-center text-slate-600 font-black text-[11px] border-r border-slate-100">{item.quantity}</td>
-                      <td className="px-4 py-4 text-right font-black text-[#2d4b38] text-[12px]">Ksh {item.total.toLocaleString()}</td>
+                      <td className="px-3 py-3 text-center text-slate-600 font-semibold text-[11px] border-r border-slate-100">Ksh {item.unitPrice.toLocaleString()}</td>
+                      <td className="px-3 py-3 text-center text-slate-600 font-black text-[11px] border-r border-slate-100">{item.quantity}</td>
+                      <td className="px-4 py-3 text-right font-black text-[#2d4b38] text-[12px]">Ksh {item.total.toLocaleString()}</td>
                     </tr>
                   ))}
                   {Array.from({ length: emptyRows }).map((_, i) => (
-                    <tr key={`empty-${i}`} className="h-10">
+                    <tr key={`empty-${i}`} className="h-8">
                       <td className="border-r border-slate-100"></td>
                       <td className="border-r border-slate-100"></td>
                       <td className="border-r border-slate-100"></td>
@@ -337,31 +339,31 @@ export default function DocumentGenerator() {
                 </tbody>
                 <tfoot className="border-t-2 border-[#2d4b38]">
                   <tr>
-                    <td colSpan={3} className="px-4 py-2 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">Sub Total</td>
-                    <td colSpan={2} className="px-4 py-2 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[12px]">Ksh {calculateSubtotal().toLocaleString()}</td>
+                    <td colSpan={3} className="px-4 py-1.5 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">Sub Total</td>
+                    <td colSpan={2} className="px-4 py-1.5 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[11px]">Ksh {subtotal.toLocaleString()}</td>
                   </tr>
                   <tr>
-                    <td colSpan={3} className="px-4 py-2 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">VAT (16%)</td>
-                    <td colSpan={2} className="px-4 py-2 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[12px]">Ksh {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                    <td colSpan={3} className="px-4 py-1.5 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">VAT (16%)</td>
+                    <td colSpan={2} className="px-4 py-1.5 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[11px]">Ksh {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td colSpan={3} className="px-4 py-3 text-right text-[10px] font-black uppercase text-[#2d4b38] tracking-widest">Grand Total</td>
-                    <td colSpan={2} className="px-4 py-3 text-right font-black text-xl text-[#e15d2a] tracking-tighter border-l border-slate-100">Ksh {totalAmount.toLocaleString()}</td>
+                    <td colSpan={3} className="px-4 py-2 text-right text-[10px] font-black uppercase text-[#2d4b38] tracking-widest">Grand Total</td>
+                    <td colSpan={2} className="px-4 py-2 text-right font-black text-lg text-[#e15d2a] tracking-tighter border-l border-slate-100">Ksh {subtotal.toLocaleString()}</td>
                   </tr>
                 </tfoot>
               </table>
             </div>
 
             {/* Footer Elements */}
-            <div className="mt-12 grid grid-cols-2 gap-10 items-end">
-              <div className="space-y-4">
-                <div className="space-y-1.5">
+            <div className="mt-8 grid grid-cols-2 gap-10 items-end">
+              <div className="space-y-3">
+                <div className="space-y-1">
                   <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">Terms & Condition</Badge>
                   <p className="text-[9px] text-slate-400 font-medium leading-relaxed max-w-xs uppercase">
                     {fixedTerms}
                   </p>
                 </div>
-                <h4 className="text-md font-black text-[#2d4b38] uppercase italic opacity-40">Thanks For Your Business</h4>
+                <h4 className="text-md font-black text-[#2d4b38] uppercase italic opacity-30">Thanks For Your Business</h4>
               </div>
               <div className="text-right space-y-2">
                  <div className="inline-block w-40 border-b-2 border-slate-300"></div>
@@ -370,7 +372,7 @@ export default function DocumentGenerator() {
             </div>
           </div>
 
-          <div className="bg-[#2d4b38] h-10 flex items-center justify-center mt-6">
+          <div className="bg-[#2d4b38] h-10 flex items-center justify-center mt-auto">
             <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30">DOCKWOOD FURNITURES LIMITED - QUALITY GUARANTEED</p>
           </div>
         </div>
@@ -550,7 +552,7 @@ export default function DocumentGenerator() {
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Grand Total</p>
                 <div className="text-5xl font-black tracking-tighter">
-                   Ksh {totalAmount.toLocaleString()}
+                   Ksh {subtotal.toLocaleString()}
                 </div>
               </div>
 
