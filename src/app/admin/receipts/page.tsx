@@ -24,7 +24,8 @@ import {
   MapPin,
   Globe,
   Hash,
-  Info
+  Info,
+  Building
 } from "lucide-react";
 import { 
   AlertDialog, 
@@ -38,7 +39,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useCollection, useFirestore, useUser } from "@/firebase";
-import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, doc, where } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, orderBy, deleteDoc, doc } from "firebase/firestore";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -68,6 +69,7 @@ export default function DocumentGenerator() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
+  const [customerPin, setCustomerPin] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [items, setItems] = useState<ReceiptItem[]>([{ description: "", quantity: 1, unitPrice: 0, total: 0 }]);
   const [docNumber, setDocNumber] = useState("");
@@ -138,6 +140,7 @@ export default function DocumentGenerator() {
           customerPhone,
           customerEmail,
           customerAddress,
+          customerPin,
           paymentMethod,
           items,
           totalAmount: calculateSubtotal(),
@@ -179,6 +182,7 @@ export default function DocumentGenerator() {
     setCustomerPhone("");
     setCustomerEmail("");
     setCustomerAddress("");
+    setCustomerPin("");
     setPaymentMethod("Cash");
     setItems([{ description: "", quantity: 1, unitPrice: 0, total: 0 }]);
     const prefix = docType === "Invoice" ? "INV" : docType === "Quotation" ? "QTN" : "REC";
@@ -268,6 +272,7 @@ export default function DocumentGenerator() {
                       {customerAddress && <p>{customerAddress}</p>}
                       {customerPhone && <p>Phone: {customerPhone}</p>}
                       {customerEmail && <p>Email: {customerEmail}</p>}
+                      {customerPin && <p className="font-bold text-slate-600 mt-2">Customer PIN: {customerPin}</p>}
                    </div>
                 </div>
                 <div className="text-right">
@@ -414,7 +419,7 @@ export default function DocumentGenerator() {
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                   <Label className="font-bold text-primary/80">Email Address</Label>
                   <Input 
@@ -432,6 +437,15 @@ export default function DocumentGenerator() {
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
                     className="h-12 rounded-2xl bg-slate-50 border-none shadow-inner"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="font-bold text-primary/80">Customer KRA PIN (Optional)</Label>
+                  <Input 
+                    placeholder="e.g. A012345678Z" 
+                    value={customerPin}
+                    onChange={(e) => setCustomerPin(e.target.value)}
+                    className="h-12 rounded-2xl bg-slate-50 border-none shadow-inner uppercase"
                   />
                 </div>
               </div>
@@ -608,6 +622,7 @@ export default function DocumentGenerator() {
                       setCustomerPhone(rec.customerPhone || "");
                       setCustomerEmail(rec.customerEmail || "");
                       setCustomerAddress(rec.customerAddress || "");
+                      setCustomerPin(rec.customerPin || "");
                       setPaymentMethod(rec.paymentMethod || "Cash");
                       setItems(rec.items);
                       setDocNumber(rec.receiptNumber);

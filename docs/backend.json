@@ -78,6 +78,7 @@
         "customerPhone": { "type": "string" },
         "customerAddress": { "type": "string" },
         "customerEmail": { "type": "string" },
+        "customerPin": { "type": "string" },
         "items": {
           "type": "array",
           "items": {
