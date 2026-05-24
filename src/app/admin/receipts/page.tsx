@@ -21,7 +21,8 @@ import {
   Mail,
   MapPin,
   Hash,
-  X
+  X,
+  CreditCard
 } from "lucide-react";
 import { 
   AlertDialog, 
@@ -62,7 +63,9 @@ export default function DocumentGenerator() {
 
   // Corporate Constants
   const companyPin = "A004777295T"; 
-  const fixedTerms = "1. Goods once sold are not returnable. 2. Payments should be made via M-Pesa or Bank to the account details provided. 3. This is a computer-generated document and is valid without a physical stamp.";
+  const paybillNumber = "522533";
+  const accountNumber = "8040733";
+  const fixedTerms = "1. Goods once sold are not returnable. 2. Payments should be made via M-Pesa Paybill or Bank. 3. This is a computer-generated document valid without a physical stamp.";
 
   // Form States
   const [customerName, setCustomerName] = useState("");
@@ -70,7 +73,7 @@ export default function DocumentGenerator() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [customerPin, setCustomerPin] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Cash");
+  const [paymentMethod, setPaymentMethod] = useState("M-Pesa");
   const [items, setItems] = useState<ReceiptItem[]>([{ description: "", quantity: 1, unitPrice: 0, total: 0 }]);
   const [docNumber, setDocNumber] = useState("");
 
@@ -179,7 +182,7 @@ export default function DocumentGenerator() {
     setCustomerEmail("");
     setCustomerAddress("");
     setCustomerPin("");
-    setPaymentMethod("Cash");
+    setPaymentMethod("M-Pesa");
     setItems([{ description: "", quantity: 1, unitPrice: 0, total: 0 }]);
     const prefix = docType === "Invoice" ? "INV" : docType === "Quotation" ? "QTN" : "REC";
     setDocNumber(`${prefix}-${Math.floor(100000 + Math.random() * 900000)}`);
@@ -253,10 +256,6 @@ export default function DocumentGenerator() {
                   <Phone className="h-3.5 w-3.5 text-[#e15d2a]" />
                   <span>+254 711 662 626</span>
                </div>
-               <div className="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                  <Mail className="h-3.5 w-3.5 text-[#e15d2a]" />
-                  <span>info@dockwoodfurnitures.com</span>
-               </div>
             </div>
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
               PIN: <span className="text-[#2d4b38]">{companyPin}</span>
@@ -291,9 +290,10 @@ export default function DocumentGenerator() {
                 </div>
                 
                 <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[10px] tracking-widest rounded-sm py-1 px-4 border-none">Payment Info</Badge>
-                <div className="text-[12px] text-slate-500 font-medium space-y-0.5 mt-1">
+                <div className="text-[12px] text-slate-500 font-medium space-y-1 mt-1">
                   <p>Mode: <span className="font-bold text-[#2d4b38]">{paymentMethod}</span></p>
-                  <p>Account: Dockwood Furnitures Ltd</p>
+                  <p>Paybill: <span className="font-bold text-[#e15d2a]">{paybillNumber}</span></p>
+                  <p>Account: <span className="font-bold text-[#2d4b38]">{accountNumber}</span></p>
                 </div>
               </div>
             </div>
@@ -554,7 +554,7 @@ export default function DocumentGenerator() {
                  <div className="flex flex-col gap-2 mt-4">
                     <Label className="text-[10px] font-black text-white/40 uppercase">Select Mode</Label>
                     <div className="grid grid-cols-2 gap-2">
-                       {['Cash', 'M-Pesa', 'Bank', 'Cheque'].map(m => (
+                       {['M-Pesa', 'Cash', 'Bank', 'Cheque'].map(m => (
                           <Button 
                             key={m}
                             type="button"
@@ -603,7 +603,7 @@ export default function DocumentGenerator() {
                       setCustomerEmail(rec.customerEmail || "");
                       setCustomerAddress(rec.customerAddress || "");
                       setCustomerPin(rec.customerPin || "");
-                      setPaymentMethod(rec.paymentMethod || "Cash");
+                      setPaymentMethod(rec.paymentMethod || "M-Pesa");
                       setItems(rec.items);
                       setDocNumber(rec.receiptNumber);
                       setShowPrintPreview(true);
@@ -669,3 +669,4 @@ export default function DocumentGenerator() {
     </div>
   );
 }
+
