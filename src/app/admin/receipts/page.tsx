@@ -21,11 +21,7 @@ import {
   Mail,
   MapPin,
   Hash,
-  Info,
-  Calendar,
-  CreditCard,
-  X,
-  FileSearch
+  X
 } from "lucide-react";
 import { 
   AlertDialog, 
@@ -66,7 +62,7 @@ export default function DocumentGenerator() {
 
   // Corporate Constants
   const companyPin = "A004777295T"; 
-  const fixedTerms = "1. Goods once sold are not returnable. 2. Payments should be made to the account details provided. 3. This is a computer-generated document and is valid without a physical stamp.";
+  const fixedTerms = "1. Goods once sold are not returnable. 2. Payments should be made via M-Pesa or Bank to the account details provided. 3. This is a computer-generated document and is valid without a physical stamp.";
 
   // Form States
   const [customerName, setCustomerName] = useState("");
@@ -307,6 +303,7 @@ export default function DocumentGenerator() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-[#2d4b38] text-white">
+                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-12 border-r border-white/10">#</th>
                     <th className="px-6 py-4 text-left text-[11px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
                     <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-24 border-r border-white/10">Price</th>
                     <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-20 border-r border-white/10">QTY</th>
@@ -316,6 +313,7 @@ export default function DocumentGenerator() {
                 <tbody className="divide-y divide-slate-100">
                   {items.map((item, i) => (
                     <tr key={i} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-5 text-center text-slate-600 font-bold text-sm border-r border-slate-100">{i + 1}</td>
                       <td className="px-6 py-5 border-r border-slate-100">
                          <p className="font-bold text-[#2d4b38] text-sm">{item.description}</p>
                       </td>
@@ -477,6 +475,7 @@ export default function DocumentGenerator() {
               <table className="w-full min-w-[600px] border-collapse">
                 <thead className="bg-slate-50 text-[10px] uppercase font-black tracking-widest text-muted-foreground border-b">
                   <tr>
+                    <th className="px-4 py-5 text-center border-r w-16">#</th>
                     <th className="px-8 py-5 text-left border-r">Item Description</th>
                     <th className="px-4 py-5 text-center border-r">Qty</th>
                     <th className="px-4 py-5 text-right border-r">Unit Price</th>
@@ -486,6 +485,7 @@ export default function DocumentGenerator() {
                 <tbody className="divide-y">
                   {items.map((item, index) => (
                     <tr key={index} className="group">
+                      <td className="px-4 py-6 text-center border-r font-black text-muted-foreground">{index + 1}</td>
                       <td className="px-8 py-6 border-r">
                         <Input 
                           placeholder="Product/Service name" 
