@@ -18,7 +18,6 @@ import {
   ArrowLeft,
   ChevronRight,
   History,
-  Mail,
   MapPin,
   Hash,
   X,
@@ -305,7 +304,7 @@ export default function DocumentGenerator() {
                   <tr className="bg-[#2d4b38] text-white">
                     <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-12 border-r border-white/10">#</th>
                     <th className="px-6 py-4 text-left text-[11px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
-                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-24 border-r border-white/10">Price</th>
+                    <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-24 border-r border-white/10">Unit Price</th>
                     <th className="px-4 py-4 text-center text-[11px] font-black uppercase tracking-widest w-20 border-r border-white/10">QTY</th>
                     <th className="px-6 py-4 text-right text-[11px] font-black uppercase tracking-widest w-32">Total</th>
                   </tr>
@@ -317,31 +316,27 @@ export default function DocumentGenerator() {
                       <td className="px-6 py-5 border-r border-slate-100">
                          <p className="font-bold text-[#2d4b38] text-sm">{item.description}</p>
                       </td>
-                      <td className="px-4 py-5 text-center text-slate-600 font-semibold text-sm border-r border-slate-100">K {item.unitPrice.toLocaleString()}</td>
+                      <td className="px-4 py-5 text-center text-slate-600 font-semibold text-sm border-r border-slate-100">Ksh {item.unitPrice.toLocaleString()}</td>
                       <td className="px-4 py-5 text-center text-slate-600 font-black text-sm border-r border-slate-100">{item.quantity}</td>
-                      <td className="px-6 py-5 text-right font-black text-[#2d4b38] text-sm">K {item.total.toLocaleString()}</td>
+                      <td className="px-6 py-5 text-right font-black text-[#2d4b38] text-sm">Ksh {item.total.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
+                <tfoot className="border-t-2 border-[#2d4b38]">
+                  <tr>
+                    <td colSpan={3} className="px-6 py-3 text-right text-[11px] font-black uppercase text-slate-500 tracking-widest">Sub Total</td>
+                    <td colSpan={2} className="px-6 py-3 text-right font-bold text-[#2d4b38] border-l border-slate-100">Ksh {calculateSubtotal().toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3} className="px-6 py-3 text-right text-[11px] font-black uppercase text-slate-500 tracking-widest">VAT (16%)</td>
+                    <td colSpan={2} className="px-6 py-3 text-right font-bold text-[#2d4b38] border-l border-slate-100">Ksh {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                  </tr>
+                  <tr className="bg-slate-50">
+                    <td colSpan={3} className="px-6 py-4 text-right text-[12px] font-black uppercase text-[#2d4b38] tracking-widest">Grand Total</td>
+                    <td colSpan={2} className="px-6 py-4 text-right font-black text-2xl text-[#e15d2a] tracking-tighter border-l border-slate-100">Ksh {totalAmount.toLocaleString()}</td>
+                  </tr>
+                </tfoot>
               </table>
-            </div>
-
-            {/* Totals Section */}
-            <div className="flex justify-end">
-              <div className="w-80 space-y-2 border-t pt-4">
-                <div className="flex justify-between text-[13px] font-bold text-slate-500 px-2">
-                  <span>Sub Total:</span>
-                  <span className="text-[#2d4b38]">K {calculateSubtotal().toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-[13px] font-bold text-slate-500 px-2">
-                  <span>VAT (16%):</span>
-                  <span className="text-[#2d4b38]">K {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                </div>
-                <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100 mt-4">
-                   <span className="text-xs font-black text-[#2d4b38] uppercase tracking-widest">Grand Total:</span>
-                   <span className="text-2xl font-black text-[#e15d2a] tracking-tighter">K {totalAmount.toLocaleString()}</span>
-                </div>
-              </div>
             </div>
 
             {/* Footer Elements */}
@@ -542,7 +537,7 @@ export default function DocumentGenerator() {
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Grand Total</p>
                 <div className="text-5xl font-black tracking-tighter">
-                   KES {totalAmount.toLocaleString()}
+                   Ksh {totalAmount.toLocaleString()}
                 </div>
               </div>
 
@@ -622,7 +617,7 @@ export default function DocumentGenerator() {
                           <p className="text-[10px] text-muted-foreground font-mono font-bold">{rec.receiptNumber}</p>
                        </div>
                        <div className="text-right flex items-center gap-3">
-                          <div className="text-sm font-black text-primary">K {rec.totalAmount?.toLocaleString()}</div>
+                          <div className="text-sm font-black text-primary">Ksh {rec.totalAmount?.toLocaleString()}</div>
                           <Button 
                             variant="ghost" 
                             size="icon" 
@@ -669,4 +664,3 @@ export default function DocumentGenerator() {
     </div>
   );
 }
-
