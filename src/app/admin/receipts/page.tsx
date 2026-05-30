@@ -266,7 +266,7 @@ export default function DocumentGenerator() {
           </div>
 
           <div className="px-8 pt-2 pb-6 flex-grow">
-            {/* Bill To & Meta Info - Tightly aligned to contact bar */}
+            {/* Bill To & Meta Info - Tightly aligned to contact bar above */}
             <div className="grid grid-cols-2 gap-8 mb-4">
               <div className="space-y-1">
                 <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[8px] tracking-widest rounded-sm py-0 px-2 border-none mb-1">{getRecipientLabel()}</Badge>
