@@ -195,12 +195,12 @@ export default function DocumentGenerator() {
   };
 
   // Generate empty rows for a realistic look
-  const minRows = 8;
+  const minRows = 10;
   const emptyRows = Math.max(0, minRows - items.length);
 
   if (showPrintPreview) {
     return (
-      <div className="animate-in fade-in duration-500 max-w-4xl mx-auto space-y-8 pb-20">
+      <div className="animate-in fade-in duration-500 max-w-4xl mx-auto space-y-6 pb-20">
         <style dangerouslySetInnerHTML={{ __html: `
           @media print {
             @page { margin: 0; size: auto; }
@@ -226,9 +226,9 @@ export default function DocumentGenerator() {
           </div>
         </div>
 
-        <div id="printable-doc" className="bg-white shadow-none min-h-[1100px] flex flex-col font-sans">
-          {/* Header Section */}
-          <div className="bg-[#2d4b38] text-white p-8 relative overflow-hidden flex justify-between items-center h-40">
+        <div id="printable-doc" className="bg-white shadow-none min-h-[1050px] flex flex-col font-sans">
+          {/* Header Section - Symmetrical and Skewed */}
+          <div className="bg-[#2d4b38] text-white p-6 relative overflow-hidden flex justify-between items-center h-32">
             <div className="relative z-10 flex items-center gap-4">
               <div className="h-14 w-14 bg-white rounded-full p-1 shadow-lg flex items-center justify-center">
                  <div className="relative h-10 w-10">
@@ -241,16 +241,16 @@ export default function DocumentGenerator() {
               </div>
             </div>
             
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-[#e15d2a] skew-x-[-20deg] translate-x-12 z-0"></div>
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-[#e15d2a] skew-x-[-25deg] translate-x-16 z-0"></div>
             
-            <div className="relative z-10 text-right pr-6">
-              <h2 className="text-5xl font-black uppercase tracking-tighter text-white/90">{docType}</h2>
+            <div className="relative z-10 text-right pr-4">
+              <h2 className="text-4xl font-black uppercase tracking-tighter text-white/95">{docType}</h2>
             </div>
           </div>
 
-          {/* Contact Bar */}
-          <div className="bg-white px-8 py-3 border-b flex justify-between items-center">
-            <div className="flex gap-8">
+          {/* Contact Bar - Compact */}
+          <div className="bg-white px-8 py-2 border-b flex justify-between items-center">
+            <div className="flex gap-6">
                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600">
                   <MapPin className="h-3 w-3 text-[#e15d2a]" />
                   <span>Bombolulu, Mombasa, Kenya</span>
@@ -265,14 +265,14 @@ export default function DocumentGenerator() {
             </div>
           </div>
 
-          <div className="px-8 pt-4 pb-8 flex-grow">
-            {/* Bill To & Meta Info - Tightly aligned to line above */}
-            <div className="grid grid-cols-2 gap-10 mb-6">
-              <div className="space-y-2">
-                <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">{getRecipientLabel()}</Badge>
+          <div className="px-8 pt-2 pb-6 flex-grow">
+            {/* Bill To & Meta Info - Tightly aligned to contact bar */}
+            <div className="grid grid-cols-2 gap-8 mb-4">
+              <div className="space-y-1">
+                <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[8px] tracking-widest rounded-sm py-0 px-2 border-none mb-1">{getRecipientLabel()}</Badge>
                 <div className="space-y-0.5">
-                   <h3 className="text-lg font-black text-[#2d4b38] uppercase leading-none">{customerName}</h3>
-                   <div className="text-[11px] text-slate-500 font-medium space-y-0.5 mt-1">
+                   <h3 className="text-base font-black text-[#2d4b38] uppercase leading-tight">{customerName}</h3>
+                   <div className="text-[10px] text-slate-500 font-medium space-y-0 mt-0.5">
                       <p>Phone: {customerPhone}</p>
                       <p>Email: {customerEmail}</p>
                       <p>Address: {customerAddress}</p>
@@ -280,55 +280,54 @@ export default function DocumentGenerator() {
                    </div>
                 </div>
               </div>
-              <div className="text-right space-y-2">
-                <div className="space-y-0.5">
+              <div className="text-right space-y-1">
+                <div className="space-y-0 mt-0.5">
                   <div className="flex justify-end items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{docType} No:</span>
-                    <span className="text-[#2d4b38] font-black text-sm">{docNumber}</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">{docType} No:</span>
+                    <span className="text-[#2d4b38] font-black text-xs">{docNumber}</span>
                   </div>
                   <div className="flex justify-end items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date:</span>
-                    <span className="text-[#2d4b38] font-black text-sm">{new Date().toLocaleDateString()}</span>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Date:</span>
+                    <span className="text-[#2d4b38] font-black text-xs">{new Date().toLocaleDateString()}</span>
                   </div>
                 </div>
                 
-                <div className="flex flex-col items-end gap-1 mt-1">
-                  <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">Payment Details</Badge>
-                  <div className="text-[11px] text-slate-500 font-medium space-y-0.5 text-right">
-                    <p>Mode: <span className="font-bold text-[#2d4b38]">{paymentMethod}</span></p>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[8px] tracking-widest rounded-sm py-0 px-2 border-none">{paymentMethod} Details</Badge>
+                  <div className="text-[10px] text-slate-500 font-medium space-y-0 text-right">
                     <p>Paybill: <span className="font-bold text-[#e15d2a]">{paybillNumber}</span></p>
-                    <p>Account: <span className="font-bold text-[#2d4b38]">{accountNumber}</span></p>
+                    <p>Acc: <span className="font-bold text-[#2d4b38]">{accountNumber}</span></p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Product Table */}
-            <div className="mb-6 rounded-sm overflow-hidden border border-slate-200">
+            {/* Product Table - Compact Column Widths */}
+            <div className="mb-4 rounded-sm overflow-hidden border border-slate-200">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-[#2d4b38] text-white">
-                    <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest w-10 border-r border-white/10">#</th>
-                    <th className="px-4 py-2 text-left text-[10px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
-                    <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest w-24 border-r border-white/10">Unit Price</th>
-                    <th className="px-3 py-2 text-center text-[10px] font-black uppercase tracking-widest w-16 border-r border-white/10">QTY</th>
-                    <th className="px-4 py-2 text-right text-[10px] font-black uppercase tracking-widest w-28">Total</th>
+                    <th className="px-2 py-2 text-center text-[9px] font-black uppercase tracking-widest w-8 border-r border-white/10">#</th>
+                    <th className="px-3 py-2 text-left text-[9px] font-black uppercase tracking-widest border-r border-white/10">Description</th>
+                    <th className="px-2 py-2 text-right text-[9px] font-black uppercase tracking-widest w-24 border-r border-white/10">Unit Price</th>
+                    <th className="px-2 py-2 text-center text-[9px] font-black uppercase tracking-widest w-12 border-r border-white/10">Qty</th>
+                    <th className="px-3 py-2 text-right text-[9px] font-black uppercase tracking-widest w-28">Total</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {items.map((item, i) => (
                     <tr key={i} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-3 py-3 text-center text-slate-600 font-bold text-[11px] border-r border-slate-100">{i + 1}</td>
-                      <td className="px-4 py-3 border-r border-slate-100">
-                         <p className="font-bold text-[#2d4b38] text-[12px]">{item.description}</p>
+                      <td className="px-2 py-2 text-center text-slate-600 font-bold text-[10px] border-r border-slate-100">{i + 1}</td>
+                      <td className="px-3 py-2 border-r border-slate-100">
+                         <p className="font-bold text-[#2d4b38] text-[11px]">{item.description}</p>
                       </td>
-                      <td className="px-3 py-3 text-center text-slate-600 font-semibold text-[11px] border-r border-slate-100">Ksh {item.unitPrice.toLocaleString()}</td>
-                      <td className="px-3 py-3 text-center text-slate-600 font-black text-[11px] border-r border-slate-100">{item.quantity}</td>
-                      <td className="px-4 py-3 text-right font-black text-[#2d4b38] text-[12px]">Ksh {item.total.toLocaleString()}</td>
+                      <td className="px-2 py-2 text-right text-slate-600 font-semibold text-[10px] border-r border-slate-100">Ksh {item.unitPrice.toLocaleString()}</td>
+                      <td className="px-2 py-2 text-center text-slate-600 font-black text-[10px] border-r border-slate-100">{item.quantity}</td>
+                      <td className="px-3 py-2 text-right font-black text-[#2d4b38] text-[11px]">Ksh {item.total.toLocaleString()}</td>
                     </tr>
                   ))}
                   {Array.from({ length: emptyRows }).map((_, i) => (
-                    <tr key={`empty-${i}`} className="h-8">
+                    <tr key={`empty-${i}`} className="h-6">
                       <td className="border-r border-slate-100"></td>
                       <td className="border-r border-slate-100"></td>
                       <td className="border-r border-slate-100"></td>
@@ -338,42 +337,42 @@ export default function DocumentGenerator() {
                   ))}
                 </tbody>
                 <tfoot className="border-t-2 border-[#2d4b38]">
-                  <tr>
-                    <td colSpan={3} className="px-4 py-1.5 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">Sub Total</td>
-                    <td colSpan={2} className="px-4 py-1.5 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[11px]">Ksh {subtotal.toLocaleString()}</td>
+                  <tr className="bg-slate-50/30">
+                    <td colSpan={3} className="px-3 py-1 text-right text-[8px] font-black uppercase text-slate-500 tracking-widest">Sub Total</td>
+                    <td colSpan={2} className="px-3 py-1 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[10px]">Ksh {subtotal.toLocaleString()}</td>
                   </tr>
-                  <tr>
-                    <td colSpan={3} className="px-4 py-1.5 text-right text-[9px] font-black uppercase text-slate-500 tracking-widest">VAT (16%)</td>
-                    <td colSpan={2} className="px-4 py-1.5 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[11px]">Ksh {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                  <tr className="bg-slate-50/30">
+                    <td colSpan={3} className="px-3 py-1 text-right text-[8px] font-black uppercase text-slate-500 tracking-widest">VAT (16%)</td>
+                    <td colSpan={2} className="px-3 py-1 text-right font-bold text-[#2d4b38] border-l border-slate-100 text-[10px]">Ksh {vatAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                   </tr>
                   <tr className="bg-slate-50">
-                    <td colSpan={3} className="px-4 py-2 text-right text-[10px] font-black uppercase text-[#2d4b38] tracking-widest">Grand Total</td>
-                    <td colSpan={2} className="px-4 py-2 text-right font-black text-lg text-[#e15d2a] tracking-tighter border-l border-slate-100">Ksh {subtotal.toLocaleString()}</td>
+                    <td colSpan={3} className="px-3 py-1.5 text-right text-[9px] font-black uppercase text-[#2d4b38] tracking-widest">Grand Total</td>
+                    <td colSpan={2} className="px-3 py-1.5 text-right font-black text-base text-[#e15d2a] tracking-tighter border-l border-slate-100">Ksh {subtotal.toLocaleString()}</td>
                   </tr>
                 </tfoot>
               </table>
             </div>
 
-            {/* Footer Elements */}
-            <div className="mt-8 grid grid-cols-2 gap-10 items-end">
-              <div className="space-y-3">
+            {/* Footer Elements - Tighter spacing */}
+            <div className="mt-4 grid grid-cols-2 gap-8 items-end">
+              <div className="space-y-2">
                 <div className="space-y-1">
-                  <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[9px] tracking-widest rounded-sm py-0.5 px-3 border-none">Terms & Condition</Badge>
-                  <p className="text-[9px] text-slate-400 font-medium leading-relaxed max-w-xs uppercase">
+                  <Badge className="bg-[#e15d2a] text-white uppercase font-black text-[8px] tracking-widest rounded-sm py-0 px-2 border-none">Terms & Condition</Badge>
+                  <p className="text-[8px] text-slate-400 font-medium leading-tight max-w-xs uppercase">
                     {fixedTerms}
                   </p>
                 </div>
-                <h4 className="text-md font-black text-[#2d4b38] uppercase italic opacity-30">Thanks For Your Business</h4>
+                <h4 className="text-sm font-black text-[#2d4b38] uppercase italic opacity-20">Thanks For Your Business</h4>
               </div>
-              <div className="text-right space-y-2">
-                 <div className="inline-block w-40 border-b-2 border-slate-300"></div>
-                 <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest pr-4">Authorize signature</p>
+              <div className="text-right space-y-1">
+                 <div className="inline-block w-32 border-b-2 border-slate-300"></div>
+                 <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest pr-4">Authorize signature</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#2d4b38] h-10 flex items-center justify-center mt-auto">
-            <p className="text-[8px] font-black uppercase tracking-[0.4em] text-white/30">DOCKWOOD FURNITURES LIMITED - QUALITY GUARANTEED</p>
+          <div className="bg-[#2d4b38] h-8 flex items-center justify-center mt-auto">
+            <p className="text-[7px] font-black uppercase tracking-[0.5em] text-white/30">DOCKWOOD FURNITURES LIMITED - QUALITY GUARANTEED</p>
           </div>
         </div>
       </div>
@@ -381,20 +380,20 @@ export default function DocumentGenerator() {
   }
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
           <h1 className="text-4xl font-headline font-black text-primary tracking-tight">Billing & Documents</h1>
           <p className="text-muted-foreground font-medium">Create and manage corporate records for your clients.</p>
         </div>
-        <div className="flex gap-2 p-1.5 bg-white border shadow-sm rounded-2xl">
+        <div className="flex gap-2 p-1 bg-white border shadow-sm rounded-2xl">
            {(["Invoice", "Receipt", "Quotation"] as DocType[]).map((type) => (
              <Button
                key={type}
                variant="ghost"
                onClick={() => setDocType(type)}
                className={cn(
-                 "rounded-xl h-11 px-8 text-[11px] font-black transition-all",
+                 "rounded-xl h-10 px-6 text-[10px] font-black transition-all",
                  docType === type ? "bg-accent text-white shadow-lg shadow-accent/20" : "text-muted-foreground hover:bg-slate-50"
                )}
              >
@@ -407,7 +406,7 @@ export default function DocumentGenerator() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-8">
           <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
-            <CardHeader className="bg-slate-50/50 pb-6 border-b">
+            <CardHeader className="bg-slate-50/50 pb-4 border-b">
               <div className="flex items-center gap-3">
                  <div className="p-2.5 rounded-xl bg-primary text-white">
                     <User className="h-5 w-5" />
@@ -415,15 +414,15 @@ export default function DocumentGenerator() {
                  <CardTitle className="text-lg font-bold">Client Information</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-8 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CardContent className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="font-bold text-primary/80">Customer Name / Company</Label>
                   <Input 
                     placeholder="e.g. Samuel Maina" 
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="h-12 rounded-2xl bg-slate-50 border-none shadow-inner"
+                    className="h-11 rounded-xl bg-slate-50 border-none shadow-inner"
                   />
                 </div>
                 <div className="space-y-2">
@@ -432,11 +431,11 @@ export default function DocumentGenerator() {
                     placeholder="e.g. 0711 000 000" 
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
-                    className="h-12 rounded-2xl bg-slate-50 border-none shadow-inner"
+                    className="h-11 rounded-xl bg-slate-50 border-none shadow-inner"
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label className="font-bold text-primary/80">Email Address</Label>
                   <Input 
@@ -444,7 +443,7 @@ export default function DocumentGenerator() {
                     placeholder="client@mail.com" 
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
-                    className="h-12 rounded-2xl bg-slate-50 border-none shadow-inner"
+                    className="h-11 rounded-xl bg-slate-50 border-none shadow-inner"
                   />
                 </div>
                 <div className="space-y-2">
@@ -453,7 +452,7 @@ export default function DocumentGenerator() {
                     placeholder="e.g. Nyali, Mombasa" 
                     value={customerAddress}
                     onChange={(e) => setCustomerAddress(e.target.value)}
-                    className="h-12 rounded-2xl bg-slate-50 border-none shadow-inner"
+                    className="h-11 rounded-xl bg-slate-50 border-none shadow-inner"
                   />
                 </div>
                 <div className="space-y-2">
@@ -462,7 +461,7 @@ export default function DocumentGenerator() {
                     placeholder="e.g. A0123..." 
                     value={customerPin}
                     onChange={(e) => setCustomerPin(e.target.value)}
-                    className="h-12 rounded-2xl bg-slate-50 border-none shadow-inner uppercase"
+                    className="h-11 rounded-xl bg-slate-50 border-none shadow-inner uppercase"
                   />
                 </div>
               </div>
@@ -470,58 +469,58 @@ export default function DocumentGenerator() {
           </Card>
 
           <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
-            <CardHeader className="bg-slate-50/50 pb-6 border-b flex flex-row justify-between items-center">
+            <CardHeader className="bg-slate-50/50 pb-4 border-b flex flex-row justify-between items-center">
               <div className="flex items-center gap-3">
                  <div className="p-2.5 rounded-xl bg-accent text-white">
                     <FileText className="h-5 w-5" />
                  </div>
                  <CardTitle className="text-lg font-bold">Document Items</CardTitle>
               </div>
-              <Button type="button" onClick={addItem} variant="outline" className="rounded-xl h-10 px-6 text-[11px] font-black border-accent text-accent hover:bg-accent hover:text-white">
+              <Button type="button" onClick={addItem} variant="outline" className="rounded-xl h-9 px-4 text-[10px] font-black border-accent text-accent hover:bg-accent hover:text-white">
                  <Plus className="mr-2 h-4 w-4" /> ADD LINE
               </Button>
             </CardHeader>
             <CardContent className="p-0 overflow-x-auto">
               <table className="w-full min-w-[600px] border-collapse">
-                <thead className="bg-slate-50 text-[10px] uppercase font-black tracking-widest text-muted-foreground border-b">
+                <thead className="bg-slate-50 text-[9px] uppercase font-black tracking-widest text-muted-foreground border-b">
                   <tr>
-                    <th className="px-4 py-5 text-center border-r w-16">#</th>
-                    <th className="px-8 py-5 text-left border-r">Item Description</th>
-                    <th className="px-4 py-5 text-center border-r">Qty</th>
-                    <th className="px-4 py-5 text-right border-r">Unit Price</th>
-                    <th className="px-8 py-5 text-right w-24">Action</th>
+                    <th className="px-3 py-4 text-center border-r w-12">#</th>
+                    <th className="px-6 py-4 text-left border-r">Item Description</th>
+                    <th className="px-3 py-4 text-center border-r w-20">Qty</th>
+                    <th className="px-3 py-4 text-right border-r w-36">Unit Price</th>
+                    <th className="px-6 py-4 text-right w-20">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
                   {items.map((item, index) => (
                     <tr key={index} className="group">
-                      <td className="px-4 py-6 text-center border-r font-black text-muted-foreground">{index + 1}</td>
-                      <td className="px-8 py-6 border-r">
+                      <td className="px-3 py-4 text-center border-r font-black text-muted-foreground">{index + 1}</td>
+                      <td className="px-6 py-4 border-r">
                         <Input 
                           placeholder="Product/Service name" 
                           value={item.description}
                           onChange={(e) => updateItem(index, 'description', e.target.value)}
-                          className="h-12 rounded-xl bg-slate-50/50 border-none font-bold"
+                          className="h-10 rounded-xl bg-slate-50/50 border-none font-bold"
                         />
                       </td>
-                      <td className="px-4 py-6 w-24 border-r">
+                      <td className="px-3 py-4 border-r">
                         <Input 
                           type="number"
                           value={item.quantity}
                           onChange={(e) => updateItem(index, 'quantity', Math.max(1, Number(e.target.value)))}
-                          className="h-12 rounded-xl text-center bg-slate-50/50 border-none font-bold"
+                          className="h-10 rounded-xl text-center bg-slate-50/50 border-none font-bold"
                         />
                       </td>
-                      <td className="px-4 py-6 w-44 border-r">
+                      <td className="px-3 py-4 border-r">
                         <Input 
                           type="number"
                           placeholder="0"
                           value={item.unitPrice || ""}
                           onChange={(e) => updateItem(index, 'unitPrice', Number(e.target.value))}
-                          className="h-12 rounded-xl text-right bg-slate-50/50 border-none font-bold"
+                          className="h-10 rounded-xl text-right bg-slate-50/50 border-none font-bold"
                         />
                       </td>
-                      <td className="px-8 py-6 text-right">
+                      <td className="px-6 py-4 text-right">
                         <Button 
                           type="button"
                           variant="ghost" 
@@ -542,27 +541,27 @@ export default function DocumentGenerator() {
 
         <div className="lg:col-span-4 space-y-8">
           <Card className="border-none shadow-2xl bg-primary text-white rounded-3xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-8 opacity-10">
-               <Hash className="h-32 w-32" />
+            <div className="absolute top-0 right-0 p-6 opacity-10">
+               <Hash className="h-24 w-24" />
             </div>
-            <CardHeader>
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">{docType} Summary</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-[9px] font-black uppercase tracking-[0.3em] text-accent">{docType} Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-10">
+            <CardContent className="space-y-8">
               <div className="space-y-1">
-                <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Grand Total</p>
-                <div className="text-5xl font-black tracking-tighter">
+                <p className="text-[9px] font-bold text-white/40 uppercase tracking-widest">Grand Total</p>
+                <div className="text-4xl font-black tracking-tighter">
                    Ksh {subtotal.toLocaleString()}
                 </div>
               </div>
 
-              <div className="space-y-4 pt-6 border-t border-white/10">
-                 <div className="flex justify-between text-[11px] font-bold uppercase tracking-widest">
+              <div className="space-y-4 pt-4 border-t border-white/10">
+                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
                     <span className="opacity-40">Payment Mode</span>
-                    <Badge className="bg-accent/20 text-accent hover:bg-accent/20 border-none">{paymentMethod}</Badge>
+                    <Badge className="bg-accent/20 text-accent hover:bg-accent/20 border-none py-0">{paymentMethod}</Badge>
                  </div>
-                 <div className="flex flex-col gap-2 mt-4">
-                    <Label className="text-[10px] font-black text-white/40 uppercase">Select Mode</Label>
+                 <div className="flex flex-col gap-2 mt-2">
+                    <Label className="text-[9px] font-black text-white/40 uppercase">Select Mode</Label>
                     <div className="grid grid-cols-2 gap-2">
                        {['M-Pesa', 'Cash', 'Bank', 'Cheque'].map(m => (
                           <Button 
@@ -571,7 +570,7 @@ export default function DocumentGenerator() {
                             variant="ghost"
                             onClick={() => setPaymentMethod(m)}
                             className={cn(
-                               "h-9 text-[10px] font-black rounded-lg transition-all",
+                               "h-8 text-[9px] font-black rounded-lg transition-all",
                                paymentMethod === m ? "bg-accent text-white" : "bg-white/5 text-white/50"
                             )}
                           >
@@ -585,7 +584,7 @@ export default function DocumentGenerator() {
               <Button 
                 type="button"
                 onClick={handleSaveAndPreview}
-                className="w-full h-16 bg-accent hover:bg-accent/90 text-white font-black rounded-2xl shadow-xl shadow-accent/20 text-xl transition-all active:scale-95"
+                className="w-full h-14 bg-accent hover:bg-accent/90 text-white font-black rounded-2xl shadow-xl shadow-accent/20 text-lg transition-all active:scale-95"
                 disabled={isGenerating}
               >
                 {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Printer className="mr-2" />}
@@ -595,18 +594,18 @@ export default function DocumentGenerator() {
           </Card>
 
           <Card className="border-none shadow-sm rounded-3xl overflow-hidden bg-white">
-            <CardHeader className="flex flex-row items-center justify-between border-b bg-slate-50/50 p-6">
+            <CardHeader className="flex flex-row items-center justify-between border-b bg-slate-50/50 p-4">
                <div className="flex items-center gap-2">
                   <History className="h-4 w-4 text-accent" />
-                  <CardTitle className="text-[10px] font-black uppercase tracking-widest">Recent Documents</CardTitle>
+                  <CardTitle className="text-[9px] font-black uppercase tracking-widest">Recent Documents</CardTitle>
                </div>
             </CardHeader>
             <CardContent className="p-0">
-               <div className="divide-y max-h-[500px] overflow-y-auto">
+               <div className="divide-y max-h-[400px] overflow-y-auto">
                   {historyLoading ? (
-                    <div className="p-12 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-slate-300" /></div>
+                    <div className="p-8 flex justify-center"><Loader2 className="h-6 w-6 animate-spin text-slate-300" /></div>
                   ) : filteredHistory.length > 0 ? filteredHistory.map((rec: any) => (
-                    <div key={rec.id} className="p-5 hover:bg-slate-50 transition-colors flex items-center justify-between group cursor-pointer" onClick={() => {
+                    <div key={rec.id} className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between group cursor-pointer" onClick={() => {
                       setDocType(rec.type || "Invoice");
                       setCustomerName(rec.customerName);
                       setCustomerPhone(rec.customerPhone || "");
@@ -621,35 +620,35 @@ export default function DocumentGenerator() {
                        <div className="space-y-0.5 min-w-0">
                           <div className="flex items-center gap-2">
                              <span className={cn(
-                               "text-[8px] font-black px-1.5 py-0.5 rounded-sm uppercase",
+                               "text-[7px] font-black px-1.5 py-0.5 rounded-sm uppercase",
                                rec.type === 'Quotation' ? "bg-blue-100 text-blue-700" : 
                                rec.type === 'Invoice' ? "bg-orange-100 text-orange-700" : "bg-emerald-100 text-emerald-700"
                              )}>
                                {rec.type || 'Doc'}
                              </span>
-                             <p className="font-black text-primary truncate text-sm uppercase">{rec.customerName}</p>
+                             <p className="font-black text-primary truncate text-xs uppercase">{rec.customerName}</p>
                           </div>
-                          <p className="text-[10px] text-muted-foreground font-mono font-bold">{rec.receiptNumber}</p>
+                          <p className="text-[9px] text-muted-foreground font-mono font-bold">{rec.receiptNumber}</p>
                        </div>
-                       <div className="text-right flex items-center gap-3">
-                          <div className="text-sm font-black text-primary">Ksh {rec.totalAmount?.toLocaleString()}</div>
+                       <div className="text-right flex items-center gap-2">
+                          <div className="text-xs font-black text-primary">Ksh {rec.totalAmount?.toLocaleString()}</div>
                           <Button 
                             variant="ghost" 
                             size="icon" 
-                            className="h-8 w-8 text-slate-200 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-7 w-7 text-slate-200 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={(e) => {
                               e.stopPropagation();
                               setDeleteId(rec.id);
                               setIsDeleteDialogOpen(true);
                             }}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3 w-3" />
                           </Button>
                           <ChevronRight className="h-4 w-4 text-slate-200 group-hover:text-accent transition-colors" />
                        </div>
                     </div>
                   )) : (
-                    <div className="p-20 text-center text-[10px] text-muted-foreground italic font-bold uppercase tracking-widest">No transaction history.</div>
+                    <div className="p-12 text-center text-[9px] text-muted-foreground italic font-bold uppercase tracking-widest">No transaction history.</div>
                   )}
                </div>
             </CardContent>
