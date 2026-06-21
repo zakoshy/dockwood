@@ -24,7 +24,6 @@ function AddProductForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   // Form State
   const [name, setName] = useState("");
@@ -74,6 +73,28 @@ function AddProductForm() {
     });
   };
 
+  const uploadImages = async (files: File[]) => {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dc6wz0lzi";
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "dockwood_unsigned";
+    
+    const uploadPromises = files.map(async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+      
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Failed to upload image to Cloudinary");
+      const data = await response.json();
+      return data.secure_url;
+    });
+
+    return Promise.all(uploadPromises);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db) return;
@@ -84,11 +105,15 @@ function AddProductForm() {
     }
 
     setIsSubmitting(true);
-    let finalImageUrls: string[] = [];
 
     try {
-      // Logic for image upload would go here if Cloudinary is configured
-      finalImageUrls = imagePreviews.length > 0 ? imagePreviews : ["https://picsum.photos/seed/placeholder/800/600"];
+      // Real upload to Cloudinary
+      let finalImageUrls: string[] = [];
+      if (imageFiles.length > 0) {
+        finalImageUrls = await uploadImages(imageFiles);
+      } else {
+        finalImageUrls = ["https://picsum.photos/seed/placeholder/800/600"];
+      }
 
       await addDoc(collection(db, "products"), {
         name,
@@ -167,7 +192,7 @@ function AddProductForm() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="description">Product Description (Optional)</Label>
+              <Label htmlFor="description">Product Description (Visible on Website)</Label>
               <Textarea 
                 id="description" 
                 placeholder="Describe wood quality, durability, and key features..." 
@@ -277,12 +302,12 @@ function AddProductForm() {
           <Button 
             type="submit" 
             className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg"
-            disabled={isSubmitting || isUploading}
+            disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Publishing...
+                Uploading & Saving...
               </>
             ) : (
               <>

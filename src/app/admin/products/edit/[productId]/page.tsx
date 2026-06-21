@@ -36,7 +36,6 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
   const { data: warehouses } = useCollection(warehousesQuery);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   // Form State
   const [name, setName] = useState("");
@@ -89,16 +88,40 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
     setExistingImages(prev => prev.filter((_, i) => i !== index));
   };
 
+  const uploadImages = async (files: File[]) => {
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dc6wz0lzi";
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "dockwood_unsigned";
+    
+    const uploadPromises = files.map(async (file) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", uploadPreset);
+      
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Failed to upload image to Cloudinary");
+      const data = await response.json();
+      return data.secure_url;
+    });
+
+    return Promise.all(uploadPromises);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !productRef) return;
 
     setIsSubmitting(true);
-    let uploadedUrls: string[] = [];
 
     try {
-      // Simulation of image upload for now
-      uploadedUrls = newImagePreviews;
+      // Upload new images to Cloudinary
+      let uploadedUrls: string[] = [];
+      if (newImageFiles.length > 0) {
+        uploadedUrls = await uploadImages(newImageFiles);
+      }
 
       const finalImageUrls = [...existingImages, ...uploadedUrls];
 
@@ -309,12 +332,12 @@ export default function EditProductPage(props: { params: Promise<{ productId: st
             <Button 
               type="submit" 
               className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg"
-              disabled={isSubmitting || isUploading}
+              disabled={isSubmitting}
             >
-              {isSubmitting || isUploading ? (
+              {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Saving...
+                  Uploading & Saving...
                 </>
               ) : (
                 <>

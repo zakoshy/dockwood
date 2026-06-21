@@ -84,6 +84,7 @@ export default function ProductsPage() {
                   id={product.id}
                   name={product.name}
                   category={product.category}
+                  description={product.description}
                   quantity={product.stock || 0}
                   imageUrls={product.imageUrls}
                   imageUrl={product.imageUrl}

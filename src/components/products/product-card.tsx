@@ -4,7 +4,7 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Box, Maximize2, X } from "lucide-react";
+import { MessageCircle, Box, Maximize2, X, Info } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import {
   Carousel,
@@ -27,12 +27,13 @@ interface ProductCardProps {
   id: string;
   name: string;
   category: string;
+  description?: string;
   quantity: number;
   imageUrls?: string[];
   imageUrl?: string; // Fallback
 }
 
-export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl }: ProductCardProps) {
+export function ProductCard({ id, name, category, description, quantity, imageUrls, imageUrl }: ProductCardProps) {
   const db = useFirestore();
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const displayImages = imageUrls && imageUrls.length > 0 ? imageUrls : [imageUrl || `https://picsum.photos/seed/${id}/600/450`];
@@ -60,7 +61,7 @@ export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl 
     <>
       {displayImages.length > 1 ? (
         <Carousel className="w-full h-full">
-          <CarouselContent className={inModal ? "h-[70vh]" : "h-full ml-0"}>
+          <CarouselContent className={inModal ? "h-[60vh]" : "h-full ml-0"}>
             {displayImages.map((url, index) => (
               <CarouselItem key={index} className="h-full pl-0 relative">
                 <div className="relative w-full h-full">
@@ -75,8 +76,12 @@ export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl 
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="left-4 bg-white/80 border-none h-10 w-10" />
-          <CarouselNext className="right-4 bg-white/80 border-none h-10 w-10" />
+          {displayImages.length > 1 && (
+            <>
+              <CarouselPrevious className="left-4 bg-white/80 border-none h-10 w-10" />
+              <CarouselNext className="right-4 bg-white/80 border-none h-10 w-10" />
+            </>
+          )}
         </Carousel>
       ) : (
         <div className="h-full w-full relative">
@@ -119,10 +124,36 @@ export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl 
           </div>
         </div>
 
-        <DialogContent className="max-w-[95vw] w-full h-[90vh] p-0 bg-black/95 border-none rounded-none sm:rounded-none overflow-hidden flex flex-col items-center justify-center">
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 bg-black/95 border-none rounded-none sm:rounded-none overflow-hidden flex flex-col md:flex-row">
           <DialogTitle className="sr-only">Product Image Viewer: {name}</DialogTitle>
-          <div className="relative w-full h-full p-4 md:p-12">
+          <div className="relative flex-1 h-[60vh] md:h-full p-4 md:p-12 flex items-center justify-center">
             <ImageContent inModal />
+          </div>
+          <div className="w-full md:w-[400px] bg-white p-8 overflow-y-auto flex flex-col gap-6">
+            <div>
+              <Badge className="mb-2 bg-accent text-white border-none">{category}</Badge>
+              <h2 className="text-3xl font-headline font-bold text-primary mb-4">{name}</h2>
+              <div className="h-1 w-12 bg-accent rounded-full mb-6"></div>
+              
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <Info className="h-5 w-5 text-accent shrink-0 mt-1" />
+                  <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    {description || "No description available for this product."}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-auto pt-8 border-t">
+              <Button 
+                onClick={handleInquiry} 
+                className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl shadow-xl"
+              >
+                <MessageCircle className="mr-2 h-5 w-5" />
+                Inquire via WhatsApp
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -133,11 +164,16 @@ export function ProductCard({ id, name, category, quantity, imageUrls, imageUrl 
         </h3>
       </CardHeader>
       
-      <CardContent className="p-4 pt-2 flex-grow">
-        <div className="flex items-center text-sm text-muted-foreground">
-          <Box className="h-4 w-4 mr-2 shrink-0" />
+      <CardContent className="p-4 pt-2 flex-grow flex flex-col gap-2">
+        <div className="flex items-center text-xs text-muted-foreground font-medium">
+          <Box className="h-3.5 w-3.5 mr-2 shrink-0" />
           <span className="truncate">{category} Selection</span>
         </div>
+        {description && (
+          <p className="text-xs text-muted-foreground line-clamp-2 italic leading-relaxed">
+            {description}
+          </p>
+        )}
       </CardContent>
       
       <CardFooter className="p-4 pt-0">
